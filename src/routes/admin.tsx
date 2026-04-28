@@ -14,6 +14,46 @@ function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [activeTab, setActiveTab] = useState<'quotes' | 'reviews' | 'gallery'>('quotes')
   
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password === 'siouxland123') {
+      setIsLoggedIn(true)
+    } else {
+      alert('Incorrect password')
+    }
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+        <form onSubmit={handleLogin} className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md">
+          <h1 className="text-2xl font-black uppercase tracking-tighter mb-8 text-center text-slate-950">Owner Login</h1>
+          <input 
+            type="password" 
+            placeholder="Enter password" 
+            autoFocus
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 mb-6 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+          />
+          <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all">
+            Enter Dashboard
+          </button>
+        </form>
+      </div>
+    )
+  }
+
+  return (
+    <AdminDashboard activeTab={activeTab} setActiveTab={setActiveTab} setIsLoggedIn={setIsLoggedIn} />
+  )
+}
+
+function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: { 
+  activeTab: 'quotes' | 'reviews' | 'gallery', 
+  setActiveTab: (tab: 'quotes' | 'reviews' | 'gallery') => void,
+  setIsLoggedIn: (val: boolean) => void
+}) {
   const { data: quotes } = useSuspenseQuery(convexQuery(api.admin.list, {}))
   const { data: allReviews } = useSuspenseQuery(convexQuery(api.reviews.listAll, {}))
   const { data: galleryImages } = useSuspenseQuery(convexQuery(api.gallery.list, {}))
@@ -25,15 +65,6 @@ function AdminPage() {
   const deleteGalleryImage = useMutation(api.gallery.remove)
 
   const galleryInputRef = useRef<HTMLInputElement>(null)
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (password === 'siouxland123') {
-      setIsLoggedIn(true)
-    } else {
-      alert('Incorrect password')
-    }
-  }
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return
@@ -55,28 +86,8 @@ function AdminPage() {
     }
   }
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
-        <form onSubmit={handleLogin} className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md">
-          <h1 className="text-2xl font-black uppercase tracking-tighter mb-8 text-center text-slate-950">Owner Login</h1>
-          <input 
-            type="password" 
-            placeholder="Enter password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 mb-6 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
-          />
-          <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all">
-            Enter Dashboard
-          </button>
-        </form>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-12">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-12 text-slate-900">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
           <div>

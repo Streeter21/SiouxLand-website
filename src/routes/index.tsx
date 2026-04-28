@@ -8,8 +8,6 @@ export const Route = createFileRoute('/')({
 })
 
 function HomePage() {
-  const { data: galleryImages } = useSuspenseQuery(convexQuery(api.gallery.list, {}))
-
   return (
     <div>
       {/* Hero Section */}
@@ -49,11 +47,11 @@ function HomePage() {
             <div className="hidden md:block">
                <div className="aspect-square bg-blue-950/20 border border-blue-900/30 rounded-3xl p-12 relative">
                   <div className="absolute -top-12 -right-12 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl" />
-                  <div className="relative z-10 flex flex-col justify-center h-full">
+                  <div className="relative z-10 flex flex-col justify-center h-full text-center">
                     <p className="text-4xl italic text-blue-400 font-serif mb-6 leading-tight">
                       "Professional, fast, and completely stress-free."
                     </p>
-                    <p className="font-bold uppercase tracking-widest text-sm">— Locally Owned & Operated</p>
+                    <p className="font-bold uppercase tracking-widest text-sm">— SiouxLand Clean Out Crew</p>
                   </div>
                </div>
             </div>
@@ -64,27 +62,59 @@ function HomePage() {
       {/* Stats/Features */}
       <section className="py-24 bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid md:grid-cols-3 gap-12 text-center md:text-left">
             <div className="space-y-4">
-              <div className="w-12 h-1 bg-blue-600" />
+              <div className="w-12 h-1 bg-blue-600 mx-auto md:mx-0" />
               <h4 className="text-xl font-bold uppercase tracking-tighter">New Business Energy</h4>
-              <p className="text-slate-500 text-sm leading-relaxed">We're hungry to earn your business. Expect 110% effort and attention to detail on every single job.</p>
+              <p className="text-slate-500 text-sm leading-relaxed text-balance">We're hungry to earn your business. Expect 110% effort and attention to detail on every single job.</p>
             </div>
             <div className="space-y-4">
-              <div className="w-12 h-1 bg-blue-600" />
-              <h4 className="text-xl font-bold uppercase tracking-tighter">Locally Roots</h4>
-              <p className="text-slate-500 text-sm leading-relaxed">Not a franchise. We're your neighbors in SiouxLand, committed to keeping our community clean.</p>
+              <div className="w-12 h-1 bg-blue-600 mx-auto md:mx-0" />
+              <h4 className="text-xl font-bold uppercase tracking-tighter">Local Roots</h4>
+              <p className="text-slate-500 text-sm leading-relaxed text-balance">Not a franchise. We're your neighbors in SiouxLand, committed to keeping our community clean.</p>
             </div>
             <div className="space-y-4">
-              <div className="w-12 h-1 bg-blue-600" />
+              <div className="w-12 h-1 bg-blue-600 mx-auto md:mx-0" />
               <h4 className="text-xl font-bold uppercase tracking-tighter">No Hidden Fees</h4>
-              <p className="text-slate-500 text-sm leading-relaxed">What we quote is what you pay. Send us photos of your job for a clear, upfront estimate today.</p>
+              <p className="text-slate-500 text-sm leading-relaxed text-balance">What we quote is what you pay. Send us photos of your job for a clear, upfront estimate today.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Gallery Preview */}
+      {/* Gallery Section */}
+      <GallerySection />
+
+      {/* Call to Action */}
+      <section className="py-24 bg-blue-600 text-white text-center px-4 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="max-w-3xl mx-auto relative z-10 flex flex-col items-center">
+          <div className="bg-white p-4 rounded-3xl mb-12 shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500 hidden md:block">
+            <img 
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : 'https://siouxlandcleanout.com')}`} 
+              alt="Scan to Book"
+              className="w-32 h-32"
+            />
+            <p className="text-blue-600 font-black text-[10px] mt-2 uppercase tracking-widest">Scan to Book</p>
+          </div>
+          <h3 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-8">Ready to reclaim<br />your space?</h3>
+          <Link 
+            to="/book" 
+            className="inline-block bg-white text-blue-600 px-12 py-5 rounded-full font-black uppercase tracking-widest hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95"
+          >
+            Get A Free Quote
+          </Link>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function GallerySection() {
+  try {
+    const { data: galleryImages } = useSuspenseQuery(convexQuery(api.gallery.list, {}))
+    
+    return (
       <section id="gallery" className="py-24 bg-slate-50 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
@@ -123,28 +153,8 @@ function HomePage() {
           )}
         </div>
       </section>
-
-      {/* Call to Action */}
-      <section className="py-24 bg-blue-600 text-white text-center px-4 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="max-w-3xl mx-auto relative z-10 flex flex-col items-center">
-          <div className="bg-white p-4 rounded-3xl mb-12 shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500 hidden md:block">
-            <img 
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : 'https://siouxlandcleanout.com')}`} 
-              alt="Scan to Book"
-              className="w-32 h-32"
-            />
-            <p className="text-blue-600 font-black text-[10px] mt-2 uppercase tracking-widest">Scan to Book</p>
-          </div>
-          <h3 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-8">Ready to reclaim<br />your space?</h3>
-          <Link 
-            to="/book" 
-            className="inline-block bg-white text-blue-600 px-12 py-5 rounded-full font-black uppercase tracking-widest hover:bg-slate-100 transition-all shadow-2xl"
-          >
-            Get A Free Quote
-          </Link>
-        </div>
-      </section>
-    </div>
-  )
+    )
+  } catch (e) {
+    return null // Don't crash the home page if gallery fails
+  }
 }
