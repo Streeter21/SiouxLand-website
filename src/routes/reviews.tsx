@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import * as React from 'react'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useMutation } from 'convex/react'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
 import { api } from '../../convex/_generated/api'
 
@@ -49,7 +49,15 @@ function ReviewsPage() {
         <div className="grid md:grid-cols-3 gap-16">
           {/* Review List */}
           <div className="md:col-span-2 space-y-12">
-            <ReviewList />
+            <Suspense fallback={
+              <div className="py-20 text-center">
+                <div className="animate-pulse flex space-x-4 justify-center">
+                  <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+                </div>
+              </div>
+            }>
+              <ReviewList />
+            </Suspense>
           </div>
 
           {/* Review Form */}
@@ -134,25 +142,7 @@ function ReviewsPage() {
 }
 
 function ReviewList() {
-  const { data: reviews, isLoading, isError } = useQuery(convexQuery(api.reviews.list, {}))
-
-  if (isLoading) {
-    return (
-      <div className="py-20 text-center">
-        <div className="animate-pulse flex space-x-4 justify-center">
-          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
-        </div>
-      </div>
-    )
-  }
-
-  if (isError) {
-    return (
-      <div className="bg-slate-50 border border-slate-100 p-12 text-center rounded-2xl">
-        <p className="text-slate-400 italic">We are unable to load reviews at this time. Please try again later.</p>
-      </div>
-    )
-  }
+  const { data: reviews } = useSuspenseQuery(convexQuery(api.reviews.list, {}))
 
   if (!reviews || reviews.length === 0) {
     return (

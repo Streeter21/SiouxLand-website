@@ -8,13 +8,8 @@ import { routeTree } from './routeTree.gen'
 export function getRouter() {
   const envUrl = import.meta.env.VITE_CONVEX_URL
   const localUrl = typeof window !== 'undefined' ? localStorage.getItem('CONVEX_OVERRIDE_URL') : null
-  const fallbackUrl = 'https://warmhearted-kingfisher-830.convex.cloud'
-  const finalUrl = localUrl || envUrl || fallbackUrl
+  const finalUrl = localUrl || envUrl || 'https://warmhearted-kingfisher-830.convex.cloud'
   
-  if (!envUrl && !localUrl) {
-    console.warn('VITE_CONVEX_URL not found, using production fallback.')
-  }
-
   const convexQueryClient = new ConvexQueryClient(finalUrl)
 
   const queryClient: QueryClient = new QueryClient({
