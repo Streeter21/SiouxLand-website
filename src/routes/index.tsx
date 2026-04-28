@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { api } from '../../convex/_generated/api'
 import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
+// React import removed to fix TS6133
 export const Route = createFileRoute('/')({
   component: HomePage,
 })
