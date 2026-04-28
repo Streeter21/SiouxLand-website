@@ -8,10 +8,10 @@ import { routeTree } from './routeTree.gen'
 export function getRouter() {
   const envUrl = import.meta.env.VITE_CONVEX_URL
   const localUrl = typeof window !== 'undefined' ? localStorage.getItem('CONVEX_OVERRIDE_URL') : null
-  const finalUrl = localUrl || envUrl || 'https://anonymous-agent-3210.convex.cloud'
+  const finalUrl = localUrl || envUrl
   
-  if (!envUrl && !localUrl) {
-    console.warn('Using fallback database. Setup your VITE_CONVEX_URL for production.')
+  if (!finalUrl) {
+    console.error('CRITICAL: VITE_CONVEX_URL is not defined. Database connection will fail.')
   }
 
   const convexQueryClient = new ConvexQueryClient(finalUrl)

@@ -32,9 +32,17 @@ export const get = query({
     if (!quote) return null;
 
     // Get image URLs
-    const imageUrls = await Promise.all(
-      (quote.imageIds || []).map(async (id: any) => await ctx.storage.getUrl(id))
-    );
+    const imageUrls = [];
+    if (quote.imageIds) {
+      for (const id of quote.imageIds) {
+        try {
+          const url = await ctx.storage.getUrl(id);
+          if (url) imageUrls.push(url);
+        } catch (e) {
+          console.error(`Failed to get URL for storage ID ${id}`);
+        }
+      }
+    }
 
     return { ...quote, imageUrls };
   },

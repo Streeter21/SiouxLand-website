@@ -71,9 +71,9 @@ function BookPage() {
         other: false,
       })
       setSelectedFiles([])
-    } catch (error) {
+    } catch (error: any) {
       console.error("Submission failed", error)
-      alert("Something went wrong. Please try again.")
+      alert(`Submission failed: ${error.message || "Unknown error"}. Please check your internet connection and try again.`)
     } finally {
       setIsSubmitting(false)
     }
