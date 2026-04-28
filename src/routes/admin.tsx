@@ -257,7 +257,6 @@ function LeadCard({ quote, updateQuote }: { quote: any, updateQuote: any }) {
   const [isEditing, setIsEditing] = useState(false)
   const [status, setStatus] = useState(quote.status || 'pending')
   const [date, setDate] = useState(quote.scheduledDate || '')
-  const [time, setTime] = useState(quote.scheduledTime || '')
   const [price, setPrice] = useState(quote.price || '')
 
   const handleSave = async () => {
@@ -265,7 +264,6 @@ function LeadCard({ quote, updateQuote }: { quote: any, updateQuote: any }) {
       id: quote._id,
       status,
       scheduledDate: date,
-      scheduledTime: time,
       price,
     })
     setIsEditing(false)
