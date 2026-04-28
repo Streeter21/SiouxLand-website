@@ -11,8 +11,8 @@ function AdminPage() {
   const [password, setPassword] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [activeTab, setActiveTab] = useState<'leads' | 'reviews' | 'gallery'>('leads')
+  const [isDemoMode, setIsDemoMode] = useState(false)
   
-  // New: Emergency URL override
   const [customUrl, setCustomUrl] = useState('')
 
   const handleLogin = (e: React.FormEvent) => {
@@ -28,11 +28,11 @@ function AdminPage() {
     }
   }
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn && !isDemoMode) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          <form onSubmit={handleLogin} className="bg-white p-10 rounded-2xl shadow-2xl">
+        <div className="w-full max-w-md text-center">
+          <form onSubmit={handleLogin} className="bg-white p-10 rounded-2xl shadow-2xl text-left">
             <h1 className="text-2xl font-black uppercase tracking-tighter mb-8 text-center text-slate-950">Owner Login</h1>
             <div className="space-y-6">
               <div>
@@ -53,35 +53,103 @@ function AdminPage() {
                 </button>
               </div>
             </div>
-
-            {/* Emergency Fix Box */}
-            <div className="mt-12 pt-8 border-t border-slate-100">
-              <p className="text-[9px] text-slate-400 uppercase font-bold mb-4 text-center">Troubleshooting</p>
-              <details className="text-[10px]">
-                <summary className="text-slate-400 cursor-pointer hover:text-slate-600 text-center uppercase tracking-widest">Connect Database Manually</summary>
-                <div className="mt-4 p-4 bg-slate-50 rounded-lg">
-                  <p className="mb-2 text-slate-500">If the dashboard is stuck loading, paste your Convex Deployment URL here:</p>
-                  <input 
-                    type="text"
-                    placeholder="https://...convex.cloud"
-                    value={customUrl}
-                    onChange={(e) => setCustomUrl(e.target.value)}
-                    className="w-full p-2 border border-slate-200 rounded text-[10px]"
-                  />
-                </div>
-              </details>
-            </div>
           </form>
-          <div className="text-center mt-8">
-            <a href="/" className="text-white/20 hover:text-white/50 text-[10px] uppercase tracking-[0.3em] font-bold transition-colors">← Back to Website</a>
+
+          <div className="mt-12 space-y-4">
+            <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Database still loading?</p>
+            <button 
+              onClick={() => setIsDemoMode(true)}
+              className="bg-white/5 border border-white/10 text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all w-full"
+            >
+              Try Demo Mode (No Database Needed)
+            </button>
+            <a href="/" className="block text-white/20 hover:text-white/50 text-[10px] uppercase tracking-[0.3em] font-bold transition-colors">← Back to Website</a>
           </div>
         </div>
       </div>
     )
   }
 
+  if (isDemoMode) {
+    return <DemoDashboard setIsDemoMode={setIsDemoMode} />
+  }
+
   return (
     <AdminDashboard activeTab={activeTab} setActiveTab={setActiveTab} setIsLoggedIn={setIsLoggedIn} />
+  )
+}
+
+function DemoDashboard({ setIsDemoMode }: { setIsDemoMode: (val: boolean) => void }) {
+  const [activeTab, setActiveTab] = useState<'leads' | 'reviews' | 'gallery'>('leads')
+  const [mockQuotes, setMockQuotes] = useState([
+    {
+      _id: '1',
+      _creationTime: Date.now(),
+      name: 'John Smith (Demo)',
+      phone: '712-555-0123',
+      email: 'john@example.com',
+      description: 'I have a garage full of old tires and scrap metal that needs to go as soon as possible.',
+      heavyObjects: true,
+      stairs: false,
+      smallSpaces: true,
+      other: false,
+      imageIds: [],
+      status: 'pending',
+      price: '',
+      scheduledDate: ''
+    },
+    {
+      _id: '2',
+      _creationTime: Date.now() - 86400000,
+      name: 'Sarah Miller (Demo)',
+      phone: '712-555-9876',
+      email: 'sarah.m@gmail.com',
+      description: 'Need help clearing out a basement after a move. Mostly boxes and some old furniture.',
+      heavyObjects: true,
+      stairs: true,
+      smallSpaces: false,
+      other: false,
+      imageIds: [],
+      status: 'booked',
+      price: '250',
+      scheduledDate: '2023-12-25'
+    }
+  ])
+
+  const updateQuote = (args: any) => {
+    setMockQuotes(prev => prev.map(q => q._id === args.id ? { ...q, ...args } : q))
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-4 md:p-12 text-slate-900">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-blue-600 text-white p-4 rounded-xl mb-8 flex justify-between items-center shadow-lg">
+          <p className="text-xs font-black uppercase tracking-widest">⚠️ You are in DEMO MODE. This data is not real.</p>
+          <button onClick={() => setIsDemoMode(false)} className="bg-white text-blue-600 px-4 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">Exit Demo</button>
+        </div>
+
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+          <div>
+            <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-950">Business Dashboard</h1>
+            <div className="flex space-x-6 mt-4">
+              <button onClick={() => setActiveTab('leads')} className={`text-xs font-black uppercase tracking-widest pb-2 border-b-2 transition-all ${activeTab === 'leads' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400'}`}>
+                Leads ({mockQuotes.length})
+              </button>
+              <button className="text-xs font-black uppercase tracking-widest pb-2 border-b-2 border-transparent text-slate-300 cursor-not-allowed">Reviews (Locked in Demo)</button>
+              <button className="text-xs font-black uppercase tracking-widest pb-2 border-b-2 border-transparent text-slate-300 cursor-not-allowed">Gallery (Locked in Demo)</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-8">
+          <div className="grid gap-6">
+            {mockQuotes.map(quote => (
+              <LeadCard key={quote._id} quote={quote} updateQuote={updateQuote} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
