@@ -1,15 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { useMutation } from 'convex/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { convexQuery } from '@convex-dev/react-query'
+import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
 export const Route = createFileRoute('/reviews')({
   component: ReviewsPage,
 })
-
-import { Suspense } from 'react'
 
 function ReviewsPage() {
   const submitReview = useMutation(api.reviews.submit)
@@ -49,13 +45,7 @@ function ReviewsPage() {
         <div className="grid md:grid-cols-3 gap-16">
           {/* Review List */}
           <div className="md:col-span-2 space-y-12">
-            <Suspense fallback={
-              <div className="bg-slate-50 border border-slate-100 p-12 text-center rounded-2xl">
-                <p className="text-slate-400 italic">Loading reviews...</p>
-              </div>
-            }>
-              <ReviewList />
-            </Suspense>
+            <ReviewList />
           </div>
 
           {/* Review Form */}
@@ -140,7 +130,7 @@ function ReviewsPage() {
 }
 
 function ReviewList() {
-  const { data: reviews } = useSuspenseQuery(convexQuery(api.reviews.list, {}))
+  const reviews = useQuery(api.reviews.list, {})
 
   if (!reviews || reviews.length === 0) {
     return (

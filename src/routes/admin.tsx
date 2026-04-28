@@ -14,9 +14,16 @@ function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [activeTab, setActiveTab] = useState<'leads' | 'reviews' | 'gallery'>('leads')
   
+  // New: Emergency URL override
+  const [customUrl, setCustomUrl] = useState('')
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     if (password === 'siouxland123') {
+      if (customUrl) {
+        localStorage.setItem('CONVEX_OVERRIDE_URL', customUrl)
+        window.location.reload()
+      }
       setIsLoggedIn(true)
     } else {
       alert('Incorrect password')
@@ -25,21 +32,52 @@ function AdminPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
-        <form onSubmit={handleLogin} className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md">
-          <h1 className="text-2xl font-black uppercase tracking-tighter mb-8 text-center text-slate-950">Owner Login</h1>
-          <input 
-            type="password" 
-            placeholder="Enter password" 
-            autoFocus
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 mb-6 focus:ring-2 focus:ring-blue-600 outline-none transition-all text-slate-900"
-          />
-          <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all">
-            Enter Dashboard
-          </button>
-        </form>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          <form onSubmit={handleLogin} className="bg-white p-10 rounded-2xl shadow-2xl">
+            <h1 className="text-2xl font-black uppercase tracking-tighter mb-8 text-center text-slate-950">Owner Login</h1>
+            <div className="space-y-6">
+              <div>
+                <label className="text-[10px] uppercase font-black text-slate-400 mb-2 block">Dashboard Password</label>
+                <input 
+                  type="password" 
+                  placeholder="Enter password" 
+                  autoFocus
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all text-slate-900"
+                />
+              </div>
+
+              <div className="pt-4">
+                <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all shadow-xl shadow-blue-600/20">
+                  Enter Dashboard
+                </button>
+              </div>
+            </div>
+
+            {/* Emergency Fix Box */}
+            <div className="mt-12 pt-8 border-t border-slate-100">
+              <p className="text-[9px] text-slate-400 uppercase font-bold mb-4 text-center">Troubleshooting</p>
+              <details className="text-[10px]">
+                <summary className="text-slate-400 cursor-pointer hover:text-slate-600 text-center uppercase tracking-widest">Connect Database Manually</summary>
+                <div className="mt-4 p-4 bg-slate-50 rounded-lg">
+                  <p className="mb-2 text-slate-500">If the dashboard is stuck loading, paste your Convex Deployment URL here:</p>
+                  <input 
+                    type="text"
+                    placeholder="https://...convex.cloud"
+                    value={customUrl}
+                    onChange={(e) => setCustomUrl(e.target.value)}
+                    className="w-full p-2 border border-slate-200 rounded text-[10px]"
+                  />
+                </div>
+              </details>
+            </div>
+          </form>
+          <div className="text-center mt-8">
+            <a href="/" className="text-white/20 hover:text-white/50 text-[10px] uppercase tracking-[0.3em] font-bold transition-colors">← Back to Website</a>
+          </div>
+        </div>
       </div>
     )
   }
