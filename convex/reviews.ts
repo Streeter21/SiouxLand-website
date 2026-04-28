@@ -12,11 +12,22 @@ export const list = query({
     approved: v.boolean(),
   })),
   handler: async (ctx) => {
-    return await ctx.db
+    const reviews = await ctx.db
       .query("reviews")
       .withIndex("by_approved", (q) => q.eq("approved", true))
       .order("desc")
       .collect();
+
+    // Defensive mapping: ensure every field exists before returning
+    // This prevents "Server Error" if database records are inconsistent
+    return reviews.map(r => ({
+      _id: r._id,
+      _creationTime: r._creationTime,
+      name: r.name ?? "Anonymous",
+      rating: r.rating ?? 5,
+      comment: r.comment ?? "",
+      approved: r.approved ?? true,
+    }));
   },
 });
 
@@ -55,7 +66,15 @@ export const listAll = query({
     approved: v.boolean(),
   })),
   handler: async (ctx) => {
-    return await ctx.db.query("reviews").order("desc").collect();
+    const reviews = await ctx.db.query("reviews").order("desc").collect();
+    return reviews.map(r => ({
+      _id: r._id,
+      _creationTime: r._creationTime,
+      name: r.name ?? "Anonymous",
+      rating: r.rating ?? 5,
+      comment: r.comment ?? "",
+      approved: r.approved ?? false,
+    }));
   },
 });
 
