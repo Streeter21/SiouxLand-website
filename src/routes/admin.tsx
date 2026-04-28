@@ -9,6 +9,8 @@ export const Route = createFileRoute('/admin')({
   component: AdminPage,
 })
 
+import { Suspense } from 'react'
+
 function AdminPage() {
   const [password, setPassword] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -34,7 +36,7 @@ function AdminPage() {
             autoFocus
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 mb-6 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 mb-6 focus:ring-2 focus:ring-blue-600 outline-none transition-all text-slate-900"
           />
           <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all">
             Enter Dashboard
@@ -45,7 +47,13 @@ function AdminPage() {
   }
 
   return (
-    <AdminDashboard activeTab={activeTab} setActiveTab={setActiveTab} setIsLoggedIn={setIsLoggedIn} />
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <p className="text-slate-400 animate-pulse font-bold uppercase tracking-widest">Loading Dashboard...</p>
+      </div>
+    }>
+      <AdminDashboard activeTab={activeTab} setActiveTab={setActiveTab} setIsLoggedIn={setIsLoggedIn} />
+    </Suspense>
   )
 }
 

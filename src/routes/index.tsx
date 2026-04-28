@@ -7,6 +7,8 @@ export const Route = createFileRoute('/')({
   component: HomePage,
 })
 
+import { Suspense } from 'react'
+
 function HomePage() {
   return (
     <div>
@@ -83,7 +85,13 @@ function HomePage() {
       </section>
 
       {/* Gallery Section */}
-      <GallerySection />
+      <Suspense fallback={
+        <section className="py-24 bg-slate-50 px-4 md:px-8 text-center">
+          <p className="text-slate-400 italic">Loading portfolio...</p>
+        </section>
+      }>
+        <GallerySection />
+      </Suspense>
 
       {/* Call to Action */}
       <section className="py-24 bg-blue-600 text-white text-center px-4 relative overflow-hidden">
@@ -91,7 +99,7 @@ function HomePage() {
         <div className="max-w-3xl mx-auto relative z-10 flex flex-col items-center">
           <div className="bg-white p-4 rounded-3xl mb-12 shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500 hidden md:block">
             <img 
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : 'https://siouxlandcleanout.com')}`} 
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('https://siouxlandcleanout.com')}`} 
               alt="Scan to Book"
               className="w-32 h-32"
             />
@@ -111,50 +119,46 @@ function HomePage() {
 }
 
 function GallerySection() {
-  try {
-    const { data: galleryImages } = useSuspenseQuery(convexQuery(api.gallery.list, {}))
-    
-    return (
-      <section id="gallery" className="py-24 bg-slate-50 px-4 md:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-            <div>
-              <span className="text-blue-600 font-bold tracking-[0.2em] uppercase text-[10px] mb-4 block">Work Portfolio</span>
-              <h3 className="text-4xl md:text-5xl font-black tracking-tighter uppercase">Our Recent <span className="text-blue-600">Clean Outs</span></h3>
-            </div>
-            <Link to="/book" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors flex items-center">
-              Send us your job photos →
-            </Link>
+  const { data: galleryImages } = useSuspenseQuery(convexQuery(api.gallery.list, {}))
+  
+  return (
+    <section id="gallery" className="py-24 bg-slate-50 px-4 md:px-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div>
+            <span className="text-blue-600 font-bold tracking-[0.2em] uppercase text-[10px] mb-4 block">Work Portfolio</span>
+            <h3 className="text-4xl md:text-5xl font-black tracking-tighter uppercase">Our Recent <span className="text-blue-600">Clean Outs</span></h3>
           </div>
-          
-          {galleryImages.length === 0 ? (
-            <div className="bg-white border border-slate-200 py-32 text-center rounded-sm shadow-sm">
-              <p className="text-slate-400 italic font-medium">Starting our journey! Check back soon for job photos.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-               {galleryImages.slice(0, 8).map(img => (
-                 <div key={img._id} className="aspect-[4/5] bg-slate-200 overflow-hidden rounded-xl group relative shadow-lg">
-                   {img.url ? (
-                     <img 
-                       src={img.url} 
-                       alt={img.caption || "Job photo"} 
-                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                     />
-                   ) : (
-                     <div className="w-full h-full flex items-center justify-center text-slate-400 italic text-sm">
-                       Loading...
-                     </div>
-                   )}
-                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                 </div>
-               ))}
-            </div>
-          )}
+          <Link to="/book" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors flex items-center">
+            Send us your job photos →
+          </Link>
         </div>
-      </section>
-    )
-  } catch (e) {
-    return null // Don't crash the home page if gallery fails
-  }
+        
+        {!galleryImages || galleryImages.length === 0 ? (
+          <div className="bg-white border border-slate-200 py-32 text-center rounded-sm shadow-sm">
+            <p className="text-slate-400 italic font-medium">Starting our journey! Check back soon for job photos.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+             {galleryImages.slice(0, 8).map(img => (
+               <div key={img._id} className="aspect-[4/5] bg-slate-200 overflow-hidden rounded-xl group relative shadow-lg">
+                 {img.url ? (
+                   <img 
+                     src={img.url} 
+                     alt={img.caption || "Job photo"} 
+                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                   />
+                 ) : (
+                   <div className="w-full h-full flex items-center justify-center text-slate-400 italic text-sm">
+                     Loading...
+                   </div>
+                 )}
+                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+               </div>
+             ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )
 }

@@ -9,8 +9,9 @@ export const Route = createFileRoute('/reviews')({
   component: ReviewsPage,
 })
 
+import { Suspense } from 'react'
+
 function ReviewsPage() {
-  const { data: reviews } = useSuspenseQuery(convexQuery(api.reviews.list, {}))
   const submitReview = useMutation(api.reviews.submit)
 
   const [formData, setFormData] = useState({
@@ -36,7 +37,7 @@ function ReviewsPage() {
   }
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-screen text-slate-900">
       <div className="bg-slate-950 text-white py-20 px-4 text-center">
         <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-4">Customer Reviews</h1>
         <p className="text-slate-400 max-w-2xl mx-auto uppercase tracking-widest text-xs font-bold">
@@ -48,27 +49,13 @@ function ReviewsPage() {
         <div className="grid md:grid-cols-3 gap-16">
           {/* Review List */}
           <div className="md:col-span-2 space-y-12">
-            {reviews.length === 0 ? (
+            <Suspense fallback={
               <div className="bg-slate-50 border border-slate-100 p-12 text-center rounded-2xl">
-                <p className="text-slate-400 italic">No reviews yet. Be the first to tell us how we did!</p>
+                <p className="text-slate-400 italic">Loading reviews...</p>
               </div>
-            ) : (
-              <div className="grid gap-8">
-                {reviews.map((review) => (
-                  <div key={review._id} className="bg-white border border-slate-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex text-yellow-400 mb-4">
-                      {Array.from({ length: review.rating }).map((_, i) => (
-                        <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <p className="text-lg text-slate-800 mb-6 font-medium leading-relaxed">"{review.comment}"</p>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">— {review.name}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+            }>
+              <ReviewList />
+            </Suspense>
           </div>
 
           {/* Review Form */}
@@ -101,7 +88,7 @@ function ReviewsPage() {
                       type="text" 
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all text-white"
                       placeholder="Name"
                     />
                   </div>
@@ -130,7 +117,7 @@ function ReviewsPage() {
                       required
                       value={formData.comment}
                       onChange={(e) => setFormData(prev => ({ ...prev, comment: e.target.value }))}
-                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm min-h-[120px] focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm min-h-[120px] focus:ring-2 focus:ring-blue-600 outline-none transition-all text-white"
                       placeholder="How was our service?"
                     />
                   </div>
@@ -148,6 +135,36 @@ function ReviewsPage() {
           </div>
         </div>
       </section>
+    </div>
+  )
+}
+
+function ReviewList() {
+  const { data: reviews } = useSuspenseQuery(convexQuery(api.reviews.list, {}))
+
+  if (!reviews || reviews.length === 0) {
+    return (
+      <div className="bg-slate-50 border border-slate-100 p-12 text-center rounded-2xl">
+        <p className="text-slate-400 italic">No reviews yet. Be the first to tell us how we did!</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid gap-8">
+      {reviews.map((review) => (
+        <div key={review._id} className="bg-white border border-slate-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex text-yellow-400 mb-4">
+            {Array.from({ length: review.rating }).map((_, i) => (
+              <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            ))}
+          </div>
+          <p className="text-lg text-slate-800 mb-6 font-medium leading-relaxed">"{review.comment}"</p>
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">— {review.name}</p>
+        </div>
+      ))}
     </div>
   )
 }
