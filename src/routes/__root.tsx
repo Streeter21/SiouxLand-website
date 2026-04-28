@@ -15,11 +15,14 @@ export const Route = createRootRouteWithContext<{
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'SiouxLand Clean Out Crew' },
+      { title: 'SiouxLand Clean Out Crew | Junk Removal & Clean Outs' },
+      { name: 'description', content: 'Professional junk removal and clean out services in SiouxLand. Fast, reliable, and locally owned. Book your free quote today!' },
+      { property: 'og:image', content: '/logo.svg' },
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
-      { rel: 'icon', href: '/favicon.ico' },
+      { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' },
+      { rel: 'apple-touch-icon', href: '/logo.svg' },
     ],
   }),
   component: RootComponent,
