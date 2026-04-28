@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { api } from '../../convex/_generated/api'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
 import { Suspense } from 'react'
 
@@ -83,15 +83,7 @@ function HomePage() {
         </div>
       </section>
 
-      <Suspense fallback={
-        <div className="py-24 text-center">
-          <div className="animate-pulse flex space-x-4 justify-center">
-            <div className="rounded-full bg-slate-200 h-10 w-10"></div>
-          </div>
-        </div>
-      }>
-        <GallerySection />
-      </Suspense>
+      <GallerySection />
 
       {/* Call to Action */}
       <section className="py-24 bg-blue-600 text-white text-center px-4 relative overflow-hidden">
@@ -119,8 +111,22 @@ function HomePage() {
 }
 
 function GallerySection() {
-  const { data: galleryImages } = useSuspenseQuery(convexQuery(api.gallery.list, {}))
+  const { data: galleryImages, isLoading, isError } = useQuery(convexQuery(api.gallery.list, {}))
   
+  if (isLoading) {
+    return (
+      <div className="py-24 text-center">
+        <div className="animate-pulse flex space-x-4 justify-center">
+          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return null // Just hide gallery if it fails
+  }
+
   return (
     <section id="gallery" className="py-24 bg-slate-50 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
