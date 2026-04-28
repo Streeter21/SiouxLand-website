@@ -1,8 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useRef, useEffect, type FormEvent } from 'react'
-import { useMutation } from 'convex/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { convexQuery } from '@convex-dev/react-query'
+import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
 export const Route = createFileRoute('/admin')({
@@ -34,11 +32,11 @@ function AdminPage() {
         setIsLoggedIn(true)
         localStorage.setItem('siouxland_admin_logged_in', 'true')
       } else {
-        alert('Incorrect password')
+        alert('Incorrect password. Try: siouxland123')
       }
     } catch (err) {
       console.error(err)
-      alert('Error connecting to database. Please check your internet or Convex settings.')
+      alert('Error connecting to database. Please check your internet or connection URL below.')
     } finally {
       setIsVerifying(false)
     }
@@ -62,7 +60,7 @@ function AdminPage() {
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md text-center">
         <div className="mb-8 p-4 bg-white/5 border border-white/10 rounded-xl text-left">
-           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 text-center">Cloud Connection Active</p>
+           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 text-center">Cloud Connection Status</p>
            <p className="text-[9px] font-mono text-slate-600 break-all text-center">{import.meta.env.VITE_CONVEX_URL}</p>
         </div>
 
@@ -114,9 +112,13 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
   setActiveTab: (tab: 'leads' | 'reviews' | 'gallery' | 'settings') => void,
   onLogout: () => void
 }) {
-  const { data: quotes } = useSuspenseQuery(convexQuery(api.admin.list, {}))
-  const { data: allReviews } = useSuspenseQuery(convexQuery(api.reviews.listAll, {}))
-  const { data: galleryImages } = useSuspenseQuery(convexQuery(api.gallery.list, {}))
+  const quotesRaw = useQuery(api.admin.list, {})
+  const allReviewsRaw = useQuery(api.reviews.listAll, {})
+  const galleryImagesRaw = useQuery(api.gallery.list, {})
+
+  const quotes = quotesRaw || []
+  const allReviews = allReviewsRaw || []
+  const galleryImages = galleryImagesRaw || []
 
   // Settings tab state
   const [oldPassword, setOldPassword] = useState('')

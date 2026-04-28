@@ -24,7 +24,19 @@ export const list = query({
     customerNotes: v.optional(v.string()),
   })),
   handler: async (ctx) => {
-    return await ctx.db.query("quotes").order("desc").collect();
+    const quotes = await ctx.db.query("quotes").order("desc").collect();
+    return quotes.map(q => ({
+      ...q,
+      name: q.name || "Unknown",
+      email: q.email || "No Email",
+      phone: q.phone || "No Phone",
+      description: q.description || "",
+      heavyObjects: !!q.heavyObjects,
+      stairs: !!q.stairs,
+      smallSpaces: !!q.smallSpaces,
+      other: !!q.other,
+      imageIds: q.imageIds || [],
+    }));
   },
 });
 
