@@ -15,6 +15,7 @@ function BookPage() {
     name: '',
     email: '',
     phone: '',
+    location: '',
     description: '',
     heavyObjects: false,
     stairs: false,
@@ -24,6 +25,7 @@ function BookPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [quoteId, setQuoteId] = useState<string | null>(null)
   
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -50,15 +52,17 @@ function BookPage() {
         imageIds.push(storageId)
       }
 
-      await submitQuote({
+      const id = await submitQuote({
         ...formData,
         imageIds,
       })
+      setQuoteId(id)
       setSubmitted(true)
       setFormData({
         name: '',
         email: '',
         phone: '',
+        location: '',
         description: '',
         heavyObjects: false,
         stairs: false,
@@ -95,6 +99,21 @@ function BookPage() {
                 </div>
                 <h4 className="text-3xl font-black uppercase tracking-tighter mb-4">Request Received!</h4>
                 <p className="text-slate-600 mb-8">Thanks for reaching out. We'll review your job and contact you within 24 hours.</p>
+                
+                {quoteId && (
+                  <div className="mb-12 p-6 bg-blue-50 rounded-2xl border border-blue-100">
+                    <p className="text-sm text-blue-900 font-bold mb-4 uppercase tracking-widest">Your Private Status Link</p>
+                    <p className="text-xs text-blue-700 mb-6">Bookmark this page to see when we reply with your price and date:</p>
+                    <Link 
+                      to={`/status/$quoteId`} 
+                      params={{ quoteId }}
+                      className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-blue-700 transition-all"
+                    >
+                      View Your Quote Status →
+                    </Link>
+                  </div>
+                )}
+
                 <button 
                   onClick={() => setSubmitted(false)}
                   className="bg-slate-950 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-slate-800 transition-all"
@@ -138,6 +157,18 @@ function BookPage() {
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
                     placeholder="you@example.com"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Job Location / City</label>
+                  <input 
+                    required
+                    type="text" 
+                    value={formData.location}
+                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                    className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                    placeholder="e.g. Sioux City, IA"
                   />
                 </div>
 

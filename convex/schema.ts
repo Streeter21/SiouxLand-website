@@ -12,10 +12,13 @@ export default defineSchema({
     smallSpaces: v.boolean(),
     other: v.boolean(),
     imageIds: v.array(v.id("_storage")),
+    location: v.optional(v.string()),
     status: v.optional(v.string()), // "pending", "booked", "completed", "cancelled"
     scheduledDate: v.optional(v.string()),
     scheduledTime: v.optional(v.string()),
     price: v.optional(v.string()),
+    customerAccepted: v.optional(v.boolean()),
+    customerNotes: v.optional(v.string()),
   }),
   gallery: defineTable({
     storageId: v.id("_storage"),

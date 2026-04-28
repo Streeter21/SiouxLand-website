@@ -82,6 +82,7 @@ function DemoDashboard({ setIsDemoMode }: { setIsDemoMode: (val: boolean) => voi
       name: 'John Smith (Demo)',
       phone: '712-555-0123',
       email: 'john@example.com',
+      location: 'Sioux City, IA',
       description: 'I have a garage full of old tires and scrap metal that needs to go as soon as possible.',
       heavyObjects: true,
       stairs: false,
@@ -90,7 +91,9 @@ function DemoDashboard({ setIsDemoMode }: { setIsDemoMode: (val: boolean) => voi
       imageIds: [],
       status: 'pending',
       price: '',
-      scheduledDate: ''
+      scheduledDate: '',
+      customerAccepted: false,
+      customerNotes: ''
     },
     {
       _id: '2',
@@ -98,6 +101,7 @@ function DemoDashboard({ setIsDemoMode }: { setIsDemoMode: (val: boolean) => voi
       name: 'Sarah Miller (Demo)',
       phone: '712-555-9876',
       email: 'sarah.m@gmail.com',
+      location: 'Dakota Dunes, SD',
       description: 'Need help clearing out a basement after a move. Mostly boxes and some old furniture.',
       heavyObjects: true,
       stairs: true,
@@ -106,7 +110,9 @@ function DemoDashboard({ setIsDemoMode }: { setIsDemoMode: (val: boolean) => voi
       imageIds: [],
       status: 'booked',
       price: '250',
-      scheduledDate: '2023-12-25'
+      scheduledDate: '2023-12-25',
+      customerAccepted: true,
+      customerNotes: 'Can we move it to 2PM?'
     }
   ])
 
@@ -431,10 +437,22 @@ function LeadCard({ quote, updateQuote }: { quote: any, updateQuote: any }) {
             }`}>
               {status}
             </span>
+            {quote.customerAccepted && (
+              <span className="text-[10px] bg-green-500 text-white px-2 py-1 rounded-md font-black uppercase tracking-widest animate-pulse">
+                Customer Accepted ✓
+              </span>
+            )}
           </div>
           <p className="text-sm font-bold text-blue-600 mb-1">{quote.phone} • {quote.email}</p>
+          <p className="text-xs font-bold text-slate-700 mb-1">📍 {quote.location || 'No Location'}</p>
           <p className="text-xs text-slate-400 mb-4">Requested on {new Date(quote._creationTime).toLocaleDateString()}</p>
           
+          {quote.customerNotes && (
+            <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-6">
+               <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1 text-center">Customer Message</p>
+               <p className="text-sm text-amber-900 italic">"{quote.customerNotes}"</p>
+            </div>
+          )}
           <div className="flex flex-wrap gap-2 mb-6">
             {quote.heavyObjects && <span className="text-[10px] bg-slate-50 text-slate-600 px-2 py-1 rounded-md font-bold">Heavy</span>}
             {quote.stairs && <span className="text-[10px] bg-slate-50 text-slate-600 px-2 py-1 rounded-md font-bold">Stairs</span>}

@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const submit = mutation({
@@ -12,10 +12,57 @@ export const submit = mutation({
     smallSpaces: v.boolean(),
     other: v.boolean(),
     imageIds: v.array(v.id("_storage")),
+    location: v.string(),
   },
   returns: v.id("quotes"),
   handler: async (ctx, args) => {
-    return await ctx.db.insert("quotes", args);
+    return await ctx.db.insert("quotes", {
+      ...args,
+      status: "pending",
+      customerAccepted: false,
+    });
+  },
+});
+
+export const get = query({
+  args: { id: v.id("quotes") },
+  returns: v.any(),
+  handler: async (ctx, args) => {
+    const quote = await ctx.db.get(args.id);
+    if (!quote) return null;
+
+    // Get image URLs
+    const imageUrls = await Promise.all(
+      (quote.imageIds || []).map(async (id: any) => await ctx.storage.getUrl(id))
+    );
+
+    return { ...quote, imageUrls };
+  },
+});
+
+export const customerAction = mutation({
+  args: { 
+    id: v.id("quotes"), 
+    action: v.union(v.literal("accept"), v.literal("requestChange")),
+    message: v.optional(v.string())
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const quote = await ctx.db.get(args.id);
+    if (!quote) throw new Error("Quote not found");
+
+    if (args.action === "accept") {
+      await ctx.db.patch(args.id, { 
+        customerAccepted: true,
+        status: "booked"
+      });
+    } else {
+      await ctx.db.patch(args.id, { 
+        status: "change_requested",
+        customerNotes: args.message 
+      });
+    }
+    return null;
   },
 });
 
