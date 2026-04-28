@@ -1,8 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useRef, Suspense } from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { convexQuery } from '@convex-dev/react-query'
-import { useMutation } from 'convex/react'
+import { useState, useRef } from 'react'
+import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
 export const Route = createFileRoute('/admin')({
@@ -83,13 +81,7 @@ function AdminPage() {
   }
 
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <p className="text-slate-400 animate-pulse font-bold uppercase tracking-widest">Loading Dashboard...</p>
-      </div>
-    }>
-      <AdminDashboard activeTab={activeTab} setActiveTab={setActiveTab} setIsLoggedIn={setIsLoggedIn} />
-    </Suspense>
+    <AdminDashboard activeTab={activeTab} setActiveTab={setActiveTab} setIsLoggedIn={setIsLoggedIn} />
   )
 }
 
@@ -98,9 +90,9 @@ function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: {
   setActiveTab: (tab: 'leads' | 'reviews' | 'gallery') => void,
   setIsLoggedIn: (val: boolean) => void
 }) {
-  const { data: quotes } = useSuspenseQuery(convexQuery(api.admin.list, {}))
-  const { data: allReviews } = useSuspenseQuery(convexQuery(api.reviews.listAll, {}))
-  const { data: galleryImages } = useSuspenseQuery(convexQuery(api.gallery.list, {}))
+  const quotes = useQuery(api.admin.list, {})
+  const allReviews = useQuery(api.reviews.listAll, {})
+  const galleryImages = useQuery(api.gallery.list, {})
   
   const approveReview = useMutation(api.reviews.approve)
   const deleteReview = useMutation(api.reviews.remove)
@@ -110,6 +102,15 @@ function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: {
   const updateQuote = useMutation(api.admin.updateQuote)
 
   const galleryInputRef = useRef<HTMLInputElement>(null)
+
+  if (!quotes || !allReviews || !galleryImages) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-12 text-center">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6" />
+        <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Loading Secure Dashboard...</p>
+      </div>
+    )
+  }
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return
@@ -404,7 +405,7 @@ function LeadCard({ quote, updateQuote }: { quote: any, updateQuote: any }) {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-[10px] font-bold text-slate-400">Price:</span>
-                <span className="text-xs font-black text-green-600">{price ? `$${price}` : 'No Quote'}</span>
+                <span className="text-xs font-black text-green-600">{price ? `${price}` : 'No Quote'}</span>
               </div>
               <button 
                 onClick={() => setIsEditing(true)}
@@ -421,8 +422,8 @@ function LeadCard({ quote, updateQuote }: { quote: any, updateQuote: any }) {
 }
 
 function QuoteImage({ storageId }: { storageId: any }) {
-  const { data: url } = useSuspenseQuery(convexQuery(api.admin.getImageUrl, { storageId }))
-  if (!url) return null
+  const url = useQuery(api.admin.getImageUrl, { storageId })
+  if (!url) return <div className="aspect-square bg-slate-100 rounded-lg animate-pulse" />
   return (
     <a href={url} target="_blank" className="aspect-square rounded-lg overflow-hidden border border-slate-100 hover:opacity-80 transition-opacity">
       <img src={url} className="w-full h-full object-cover" />
