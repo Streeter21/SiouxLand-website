@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
+import { Link, Outlet } from '@tanstack/react-router'
 import {
   HeadContent,
   Scripts,
