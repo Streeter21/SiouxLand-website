@@ -36,10 +36,10 @@ export const remove = mutation({
   args: { id: v.id("gallery") },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const img = await ctx.db.get(args.id);
+    const img = await ctx.db.get("gallery", args.id);
     if (img) {
       await ctx.storage.delete(img.storageId);
-      await ctx.db.delete(args.id);
+      await ctx.db.delete("gallery", args.id);
     }
     return null;
   },

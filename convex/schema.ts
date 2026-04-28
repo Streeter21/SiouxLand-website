@@ -29,5 +29,9 @@ export default defineSchema({
     rating: v.number(),
     comment: v.string(),
     approved: v.boolean(),
-  }),
+  }).index("by_approved", ["approved"]),
+  settings: defineTable({
+    key: v.string(), // e.g., "adminPassword"
+    value: v.string(),
+  }).index("by_key", ["key"]),
 });

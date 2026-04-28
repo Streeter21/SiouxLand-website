@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { api } from '../../convex/_generated/api'
-import { useQuery } from 'convex/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { convexQuery } from '@convex-dev/react-query'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -11,7 +12,6 @@ function HomePage() {
     <div>
       {/* Hero Section */}
       <section className="bg-slate-950 text-white py-24 md:py-32 px-4 md:px-8 relative overflow-hidden">
-        {/* ... content stays same ... */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500 via-transparent to-transparent opacity-50" />
         </div>
@@ -110,7 +110,7 @@ function HomePage() {
 }
 
 function GallerySection() {
-  const galleryImages = useQuery(api.gallery.list, {})
+  const { data: galleryImages } = useSuspenseQuery(convexQuery(api.gallery.list, {}))
   
   return (
     <section id="gallery" className="py-24 bg-slate-50 px-4 md:px-8">

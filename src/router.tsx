@@ -6,7 +6,7 @@ import { ConvexProvider } from 'convex/react'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
-  const envUrl = (import.meta as any).env.VITE_CONVEX_URL
+  const envUrl = import.meta.env.VITE_CONVEX_URL
   const localUrl = typeof window !== 'undefined' ? localStorage.getItem('CONVEX_OVERRIDE_URL') : null
   const finalUrl = localUrl || envUrl || 'https://anonymous-agent-3210.convex.cloud'
   

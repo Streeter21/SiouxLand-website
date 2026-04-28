@@ -13,6 +13,7 @@ import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StatusQuoteIdRouteImport } from './routes/status.$quoteId'
 
 const ReviewsRoute = ReviewsRouteImport.update({
   id: '/reviews',
@@ -34,18 +35,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StatusQuoteIdRoute = StatusQuoteIdRouteImport.update({
+  id: '/status/$quoteId',
+  path: '/status/$quoteId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/book': typeof BookRoute
   '/reviews': typeof ReviewsRoute
+  '/status/$quoteId': typeof StatusQuoteIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/book': typeof BookRoute
   '/reviews': typeof ReviewsRoute
+  '/status/$quoteId': typeof StatusQuoteIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/book': typeof BookRoute
   '/reviews': typeof ReviewsRoute
+  '/status/$quoteId': typeof StatusQuoteIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/book' | '/reviews'
+  fullPaths: '/' | '/admin' | '/book' | '/reviews' | '/status/$quoteId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/book' | '/reviews'
-  id: '__root__' | '/' | '/admin' | '/book' | '/reviews'
+  to: '/' | '/admin' | '/book' | '/reviews' | '/status/$quoteId'
+  id: '__root__' | '/' | '/admin' | '/book' | '/reviews' | '/status/$quoteId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +76,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   BookRoute: typeof BookRoute
   ReviewsRoute: typeof ReviewsRoute
+  StatusQuoteIdRoute: typeof StatusQuoteIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/status/$quoteId': {
+      id: '/status/$quoteId'
+      path: '/status/$quoteId'
+      fullPath: '/status/$quoteId'
+      preLoaderRoute: typeof StatusQuoteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   BookRoute: BookRoute,
   ReviewsRoute: ReviewsRoute,
+  StatusQuoteIdRoute: StatusQuoteIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

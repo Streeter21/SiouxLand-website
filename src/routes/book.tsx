@@ -1,4 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import * as React from 'react'
 import { useState, useRef } from 'react'
 import { useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
@@ -105,7 +106,7 @@ function BookPage() {
                     <p className="text-sm text-blue-900 font-bold mb-4 uppercase tracking-widest">Your Private Status Link</p>
                     <p className="text-xs text-blue-700 mb-6">Bookmark this page to see when we reply with your price and date:</p>
                     <Link 
-                      to={`/status/$quoteId`} 
+                      to="/status/$quoteId" 
                       params={{ quoteId }}
                       className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-blue-700 transition-all"
                     >
@@ -148,28 +149,29 @@ function BookPage() {
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Email Address</label>
-                  <input 
-                    required
-                    type="email" 
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
-                    placeholder="you@example.com"
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Job Location / City</label>
-                  <input 
-                    required
-                    type="text" 
-                    value={formData.location}
-                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                    className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
-                    placeholder="e.g. Sioux City, IA"
-                  />
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Email Address</label>
+                    <input 
+                      required
+                      type="email" 
+                      value={formData.email}
+                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                      placeholder="you@example.com"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Job Location / City</label>
+                    <input 
+                      required
+                      type="text" 
+                      value={formData.location}
+                      onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                      placeholder="e.g. Sioux City, IA"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-6">
