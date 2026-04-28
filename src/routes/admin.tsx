@@ -13,15 +13,9 @@ function AdminPage() {
   const [activeTab, setActiveTab] = useState<'leads' | 'reviews' | 'gallery'>('leads')
   const [isDemoMode, setIsDemoMode] = useState(false)
   
-  const [customUrl, setCustomUrl] = useState('')
-
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     if (password === 'siouxland123') {
-      if (customUrl) {
-        localStorage.setItem('CONVEX_OVERRIDE_URL', customUrl)
-        window.location.reload()
-      }
       setIsLoggedIn(true)
     } else {
       alert('Incorrect password')
