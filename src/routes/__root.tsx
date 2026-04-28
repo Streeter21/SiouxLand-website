@@ -123,11 +123,14 @@ function RootComponent() {
               </ul>
             </div>
           </div>
-          <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-slate-900 text-center">
-            <p className="text-[10px] uppercase tracking-[0.3em]">
-              © {new Date().getFullYear()} SiouxLand Clean Out Crew. All rights reserved.
-            </p>
-          </div>
+            <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-slate-900 text-center">
+              <p className="text-[10px] uppercase tracking-[0.3em] mb-2">
+                © {new Date().getFullYear()} SiouxLand Clean Out Crew. All rights reserved.
+              </p>
+              <p className="text-[8px] text-slate-800 uppercase tracking-widest">
+                v1.2.0-stable
+              </p>
+            </div>
         </footer>
       </div>
       <Scripts />
