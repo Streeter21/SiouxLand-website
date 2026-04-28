@@ -6,10 +6,8 @@ import { ConvexProvider } from 'convex/react'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
-  const CONVEX_URL = (import.meta as any).env.VITE_CONVEX_URL!
-  if (!CONVEX_URL) {
-    console.error('missing envar CONVEX_URL')
-  }
+  const CONVEX_URL = (import.meta as any).env.VITE_CONVEX_URL || 'https://anonymous-agent-3210.convex.cloud'
+  
   const convexQueryClient = new ConvexQueryClient(CONVEX_URL)
 
   const queryClient: QueryClient = new QueryClient({
