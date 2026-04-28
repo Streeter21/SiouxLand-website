@@ -11,13 +11,25 @@ export const list = query({
     caption: v.optional(v.string()),
   })),
   handler: async (ctx) => {
-    const images = await ctx.db.query("gallery").order("desc").collect();
-    return Promise.all(
-      images.map(async (img) => ({
-        ...img,
-        url: await ctx.storage.getUrl(img.storageId),
-      }))
-    );
+    const images = await ctx.db.query("gallery").order("desc").take(20);
+    const results = [];
+    for (const img of images) {
+      try {
+        const url = await ctx.storage.getUrl(img.storageId);
+        results.push({
+          ...img,
+          url,
+        });
+      } catch (error) {
+        console.error(`Failed to get URL for image ${img._id}:`, error);
+        // Skip images that fail to resolve or return with null URL
+        results.push({
+          ...img,
+          url: null,
+        });
+      }
+    }
+    return results;
   },
 });
 

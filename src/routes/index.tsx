@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { api } from '../../convex/_generated/api'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
+import { Suspense } from 'react'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -82,7 +83,15 @@ function HomePage() {
         </div>
       </section>
 
-      <GallerySection />
+      <Suspense fallback={
+        <div className="py-24 text-center">
+          <div className="animate-pulse flex space-x-4 justify-center">
+            <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+          </div>
+        </div>
+      }>
+        <GallerySection />
+      </Suspense>
 
       {/* Call to Action */}
       <section className="py-24 bg-blue-600 text-white text-center px-4 relative overflow-hidden">
