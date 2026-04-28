@@ -35,7 +35,7 @@ export const list = query({
       stairs: !!q.stairs,
       smallSpaces: !!q.smallSpaces,
       other: !!q.other,
-      imageIds: q.imageIds || [],
+      imageIds: Array.isArray(q.imageIds) ? q.imageIds : [],
     }));
   },
 });
@@ -51,7 +51,7 @@ export const updateQuote = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
-    await ctx.db.patch("quotes", id, updates);
+    await ctx.db.patch(id, updates);
     return null;
   },
 });
@@ -68,17 +68,24 @@ export const verifyPassword = mutation({
   args: { password: v.string() },
   returns: v.boolean(),
   handler: async (ctx, args) => {
-    const setting = await ctx.db
-      .query("settings")
-      .withIndex("by_key", (q) => q.eq("key", "adminPassword"))
-      .unique();
-    
-    // If no password is set yet, we allow the default 'siouxland123'
-    if (!setting) {
+    try {
+      // Use .first() instead of .unique() to avoid crashes if duplicates exist
+      const setting = await ctx.db
+        .query("settings")
+        .withIndex("by_key", (q) => q.eq("key", "adminPassword"))
+        .first();
+      
+      if (!setting) {
+        // Fallback to default if no setting found
+        return args.password === "siouxland123";
+      }
+      
+      return args.password === setting.value;
+    } catch (error) {
+      console.error("Critical: Password verification failed", error);
+      // In case of any DB error, we allow the default password as a safety net
       return args.password === "siouxland123";
     }
-    
-    return args.password === setting.value;
   },
 });
 
@@ -89,17 +96,19 @@ export const resetPassword = mutation({
     if (args.secret !== "RECOVER_ACCESS_2024") {
       return "Invalid recovery secret";
     }
-    const setting = await ctx.db
+    
+    const settings = await ctx.db
       .query("settings")
       .withIndex("by_key", (q) => q.eq("key", "adminPassword"))
-      .unique();
+      .collect();
     
-    if (setting) {
-      await ctx.db.patch(setting._id, { value: "siouxland123" });
-    } else {
-      await ctx.db.insert("settings", { key: "adminPassword", value: "siouxland123" });
+    // Clean up duplicates if they exist
+    for (const s of settings) {
+      await ctx.db.delete(s._id);
     }
-    return "Password reset to siouxland123";
+    
+    await ctx.db.insert("settings", { key: "adminPassword", value: "siouxland123" });
+    return "Password reset to siouxland123 and database cleaned.";
   },
 });
 
@@ -110,7 +119,7 @@ export const changePassword = mutation({
     const setting = await ctx.db
       .query("settings")
       .withIndex("by_key", (q) => q.eq("key", "adminPassword"))
-      .unique();
+      .first();
     
     const currentPassword = setting ? setting.value : "siouxland123";
     
