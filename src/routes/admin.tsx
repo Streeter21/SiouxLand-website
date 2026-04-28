@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useRef } from 'react'
+import { useState, useRef, Suspense } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
 import { useMutation } from 'convex/react'
@@ -9,12 +9,10 @@ export const Route = createFileRoute('/admin')({
   component: AdminPage,
 })
 
-import { Suspense } from 'react'
-
 function AdminPage() {
   const [password, setPassword] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [activeTab, setActiveTab] = useState<'quotes' | 'reviews' | 'gallery'>('quotes')
+  const [activeTab, setActiveTab] = useState<'leads' | 'reviews' | 'gallery'>('leads')
   
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,8 +56,8 @@ function AdminPage() {
 }
 
 function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: { 
-  activeTab: 'quotes' | 'reviews' | 'gallery', 
-  setActiveTab: (tab: 'quotes' | 'reviews' | 'gallery') => void,
+  activeTab: 'leads' | 'reviews' | 'gallery', 
+  setActiveTab: (tab: 'leads' | 'reviews' | 'gallery') => void,
   setIsLoggedIn: (val: boolean) => void
 }) {
   const { data: quotes } = useSuspenseQuery(convexQuery(api.admin.list, {}))
@@ -71,6 +69,7 @@ function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: {
   const generateUploadUrl = useMutation(api.quotes.generateUploadUrl)
   const addToGallery = useMutation(api.gallery.add)
   const deleteGalleryImage = useMutation(api.gallery.remove)
+  const updateQuote = useMutation(api.admin.updateQuote)
 
   const galleryInputRef = useRef<HTMLInputElement>(null)
 
@@ -102,10 +101,10 @@ function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: {
             <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-950">Business Dashboard</h1>
             <div className="flex space-x-6 mt-4">
               <button 
-                onClick={() => setActiveTab('quotes')}
-                className={`text-xs font-black uppercase tracking-widest pb-2 border-b-2 transition-all ${activeTab === 'quotes' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400'}`}
+                onClick={() => setActiveTab('leads')}
+                className={`text-xs font-black uppercase tracking-widest pb-2 border-b-2 transition-all ${activeTab === 'leads' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400'}`}
               >
-                Quotes ({quotes.length})
+                Leads & Bookings ({quotes.length})
               </button>
               <button 
                 onClick={() => setActiveTab('reviews')}
@@ -124,7 +123,7 @@ function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: {
           <div className="flex items-center space-x-6">
              <div className="bg-white p-3 rounded-xl border border-slate-200 hidden md:block">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin)}`} 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent('https://siouxlandcleanout.com')}`} 
                   alt="Business QR Code"
                   className="w-12 h-12"
                 />
@@ -138,50 +137,20 @@ function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: {
           </div>
         </div>
 
-        {activeTab === 'quotes' && (
-          <div className="grid lg:grid-cols-1 gap-8">
+        {activeTab === 'leads' && (
+          <div className="space-y-8">
             <h2 className="text-xl font-black uppercase tracking-tighter flex items-center">
               <span className="w-2 h-2 bg-blue-600 rounded-full mr-3" />
-              Incoming Requests
+              Manage Customers
             </h2>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid gap-6">
               {quotes.length === 0 ? (
-                <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center text-slate-400 italic col-span-2">
-                  No quotes yet.
+                <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center text-slate-400 italic">
+                  No requests yet.
                 </div>
               ) : (
                 quotes.map(quote => (
-                  <div key={quote._id} className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-full">
-                    <div className="flex justify-between items-start mb-6">
-                      <div>
-                        <h3 className="text-lg font-black uppercase tracking-tighter text-slate-950">{quote.name}</h3>
-                        <p className="text-sm font-bold text-blue-600">{quote.phone}</p>
-                        <p className="text-xs text-slate-400">{quote.email}</p>
-                      </div>
-                      <span className="text-[10px] bg-slate-100 px-3 py-1 rounded-full text-slate-500 font-bold">
-                        {new Date(quote._creationTime).toLocaleDateString()}
-                      </span>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {quote.heavyObjects && <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-md font-bold">Heavy</span>}
-                      {quote.stairs && <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-md font-bold">Stairs</span>}
-                      {quote.smallSpaces && <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-md font-bold">Small Space</span>}
-                      {quote.other && <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-md font-bold">Special</span>}
-                    </div>
-
-                    <p className="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl mb-6 flex-grow">
-                      {quote.description}
-                    </p>
-
-                    {quote.imageIds.length > 0 && (
-                      <div className="grid grid-cols-4 gap-2">
-                         {quote.imageIds.map(id => (
-                           <QuoteImage key={id} storageId={id} />
-                         ))}
-                      </div>
-                    )}
-                  </div>
+                  <LeadCard key={quote._id} quote={quote} updateQuote={updateQuote} />
                 ))
               )}
             </div>
@@ -279,6 +248,137 @@ function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+function LeadCard({ quote, updateQuote }: { quote: any, updateQuote: any }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [status, setStatus] = useState(quote.status || 'pending')
+  const [date, setDate] = useState(quote.scheduledDate || '')
+  const [time, setTime] = useState(quote.scheduledTime || '')
+  const [price, setPrice] = useState(quote.price || '')
+
+  const handleSave = async () => {
+    await updateQuote({
+      id: quote._id,
+      status,
+      scheduledDate: date,
+      scheduledTime: time,
+      price,
+    })
+    setIsEditing(false)
+  }
+
+  return (
+    <div className={`bg-white p-8 rounded-2xl border ${status === 'booked' ? 'border-blue-500 shadow-blue-100' : 'border-slate-200'} shadow-sm`}>
+      <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+        <div className="flex-grow">
+          <div className="flex items-center gap-3 mb-2">
+            <h3 className="text-xl font-black uppercase tracking-tighter text-slate-950">{quote.name}</h3>
+            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${
+              status === 'booked' ? 'bg-blue-600 text-white' : 
+              status === 'completed' ? 'bg-green-100 text-green-700' :
+              'bg-slate-100 text-slate-500'
+            }`}>
+              {status}
+            </span>
+          </div>
+          <p className="text-sm font-bold text-blue-600 mb-1">{quote.phone} • {quote.email}</p>
+          <p className="text-xs text-slate-400 mb-4">Requested on {new Date(quote._creationTime).toLocaleDateString()}</p>
+          
+          <div className="flex flex-wrap gap-2 mb-6">
+            {quote.heavyObjects && <span className="text-[10px] bg-slate-50 text-slate-600 px-2 py-1 rounded-md font-bold">Heavy</span>}
+            {quote.stairs && <span className="text-[10px] bg-slate-50 text-slate-600 px-2 py-1 rounded-md font-bold">Stairs</span>}
+            {quote.smallSpaces && <span className="text-[10px] bg-slate-50 text-slate-600 px-2 py-1 rounded-md font-bold">Small Space</span>}
+            {quote.other && <span className="text-[10px] bg-slate-50 text-slate-600 px-2 py-1 rounded-md font-bold">Special</span>}
+          </div>
+
+          <p className="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl mb-6">
+            {quote.description}
+          </p>
+
+          {quote.imageIds.length > 0 && (
+            <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mb-6">
+               {quote.imageIds.map((id: any) => (
+                 <QuoteImage key={id} storageId={id} />
+               ))}
+            </div>
+          )}
+        </div>
+
+        <div className="w-full md:w-64 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+          <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Job Management</h4>
+          
+          {isEditing ? (
+            <div className="space-y-4">
+              <div>
+                <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">Status</label>
+                <select 
+                  value={status} 
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-600"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="booked">Booked</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">Date</label>
+                <input 
+                  type="date" 
+                  value={date} 
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-600"
+                />
+              </div>
+              <div>
+                <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">Price ($)</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. 150"
+                  value={price} 
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-600"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button 
+                  onClick={handleSave}
+                  className="flex-grow bg-blue-600 text-white py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-blue-700"
+                >
+                  Save
+                </button>
+                <button 
+                  onClick={() => setIsEditing(false)}
+                  className="bg-slate-200 text-slate-600 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest"
+                >
+                  X
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-bold text-slate-400">Scheduled:</span>
+                <span className="text-xs font-black">{date || 'TBD'}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-bold text-slate-400">Price:</span>
+                <span className="text-xs font-black text-green-600">{price ? `$${price}` : 'No Quote'}</span>
+              </div>
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="w-full border-2 border-blue-600 text-blue-600 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all"
+              >
+                Organize / Book
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

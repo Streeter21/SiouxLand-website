@@ -12,6 +12,10 @@ export default defineSchema({
     smallSpaces: v.boolean(),
     other: v.boolean(),
     imageIds: v.array(v.id("_storage")),
+    status: v.optional(v.string()), // "pending", "booked", "completed", "cancelled"
+    scheduledDate: v.optional(v.string()),
+    scheduledTime: v.optional(v.string()),
+    price: v.optional(v.string()),
   }),
   gallery: defineTable({
     storageId: v.id("_storage"),
