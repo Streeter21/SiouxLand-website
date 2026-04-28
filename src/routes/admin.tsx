@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
@@ -94,6 +94,15 @@ function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: {
   const allReviews = useQuery(api.reviews.listAll, {})
   const galleryImages = useQuery(api.gallery.list, {})
   
+  const [showTimeout, setShowTimeout] = useState(false)
+  const [manualUrl, setManualUrl] = useState('')
+
+  // Show a helper if it takes too long to load
+  useEffect(() => {
+    const timer = setTimeout(() => setShowTimeout(true), 5000)
+    return () => clearTimeout(timer)
+  }, [])
+
   const approveReview = useMutation(api.reviews.approve)
   const deleteReview = useMutation(api.reviews.remove)
   const generateUploadUrl = useMutation(api.quotes.generateUploadUrl)
@@ -103,11 +112,50 @@ function AdminDashboard({ activeTab, setActiveTab, setIsLoggedIn }: {
 
   const galleryInputRef = useRef<HTMLInputElement>(null)
 
+  const saveManualUrl = () => {
+    if (manualUrl.includes('convex.cloud')) {
+      localStorage.setItem('CONVEX_OVERRIDE_URL', manualUrl)
+      window.location.reload()
+    } else {
+      alert('Please enter a valid Convex URL (starts with https:// and ends with .convex.cloud)')
+    }
+  }
+
   if (!quotes || !allReviews || !galleryImages) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-12 text-center">
-        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6" />
-        <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Loading Secure Dashboard...</p>
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-8 text-center text-white">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-8" />
+        <h2 className="text-xl font-black uppercase tracking-tighter mb-2">Connecting to Secure Database</h2>
+        <p className="text-slate-500 text-xs uppercase tracking-[0.2em] font-bold mb-8">Verification in progress...</p>
+        
+        {showTimeout && (
+          <div className="max-w-md bg-white/5 border border-white/10 p-8 rounded-2xl animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            <p className="text-sm text-slate-300 mb-6">It's taking longer than usual. This usually means the **Convex Database URL** is missing or incorrect in your settings.</p>
+            
+            <div className="space-y-4">
+              <input 
+                type="text" 
+                placeholder="https://your-project.convex.cloud"
+                value={manualUrl}
+                onChange={(e) => setManualUrl(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs focus:ring-2 focus:ring-blue-600 outline-none text-white"
+              />
+              <button 
+                onClick={saveManualUrl}
+                className="w-full bg-blue-600 text-white py-3 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-blue-500 transition-all"
+              >
+                Save & Connect
+              </button>
+            </div>
+            
+            <button 
+              onClick={() => setIsLoggedIn(false)}
+              className="mt-8 text-slate-500 text-[9px] uppercase tracking-widest hover:text-white transition-colors"
+            >
+              ← Back to Login
+            </button>
+          </div>
+        )}
       </div>
     )
   }
