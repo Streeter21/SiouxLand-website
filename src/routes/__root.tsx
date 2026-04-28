@@ -118,7 +118,11 @@ function RootComponent() {
               <ul className="space-y-4 text-sm">
                 <li><a href="tel:7122815225" className="hover:text-white transition-colors">712-281-5225</a></li>
                 <li><a href="mailto:siouxlandcoc@gmail.com" className="hover:text-white transition-colors">siouxlandcoc@gmail.com</a></li>
-                <li><Link to="/admin" className="text-[10px] text-slate-700 hover:text-slate-500 transition-colors uppercase tracking-[0.2em] mt-8 block">Owner Login</Link></li>
+                <li className="pt-6">
+                  <Link to="/admin" className="inline-block bg-slate-900 border border-slate-800 text-slate-400 hover:text-blue-400 hover:border-blue-900 px-4 py-2 rounded text-[9px] uppercase tracking-[0.2em] transition-all">
+                    Owner Login
+                  </Link>
+                </li>
                 <li className="text-xs italic mt-2 text-slate-500 font-medium tracking-wide uppercase">New Local Business</li>
               </ul>
             </div>

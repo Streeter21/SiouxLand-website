@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, type FormEvent } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
-export const Route = createFileRoute('/admin')({
+export const Route = createFileRoute('/owner')({
   component: AdminPage,
 })
 
