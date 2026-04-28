@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import * as React from 'react'
-import { useState, Suspense } from 'react'
+import { useState } from 'react'
 import { useMutation } from 'convex/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
 import { api } from '../../convex/_generated/api'
 
@@ -21,7 +20,7 @@ function ReviewsPage() {
   const [submitted, setSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault()
     setIsSubmitting(true)
     try {
@@ -49,15 +48,7 @@ function ReviewsPage() {
         <div className="grid md:grid-cols-3 gap-16">
           {/* Review List */}
           <div className="md:col-span-2 space-y-12">
-            <Suspense fallback={
-              <div className="py-20 text-center">
-                <div className="animate-pulse flex space-x-4 justify-center">
-                  <div className="rounded-full bg-slate-200 h-10 w-10"></div>
-                </div>
-              </div>
-            }>
-              <ReviewList />
-            </Suspense>
+            <ReviewList />
           </div>
 
           {/* Review Form */}
@@ -142,9 +133,19 @@ function ReviewsPage() {
 }
 
 function ReviewList() {
-  const { data: reviews } = useSuspenseQuery(convexQuery(api.reviews.list, {}))
+  const { data: reviews, isLoading, isError } = useQuery(convexQuery(api.reviews.list, {}))
 
-  if (!reviews || reviews.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="py-20 text-center">
+        <div className="animate-pulse flex space-x-4 justify-center">
+          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (isError || !reviews || reviews.length === 0) {
     return (
       <div className="bg-slate-50 border border-slate-100 p-12 text-center rounded-2xl">
         <p className="text-slate-400 italic">No reviews yet. Be the first to tell us how we did!</p>
@@ -154,7 +155,7 @@ function ReviewList() {
 
   return (
     <div className="grid gap-8">
-      {reviews.map((review) => (
+      {reviews.map((review: any) => (
         <div key={review._id} className="bg-white border border-slate-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
           <div className="flex text-yellow-400 mb-4">
             {Array.from({ length: review.rating }).map((_, i) => (
