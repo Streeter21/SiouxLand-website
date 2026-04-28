@@ -6,9 +6,13 @@ import { ConvexProvider } from 'convex/react'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
-  const CONVEX_URL = (import.meta as any).env.VITE_CONVEX_URL || 'https://anonymous-agent-3210.convex.cloud'
+  const CONVEX_URL = (import.meta as any).env.VITE_CONVEX_URL
   
-  const convexQueryClient = new ConvexQueryClient(CONVEX_URL)
+  if (!CONVEX_URL) {
+    console.error('VITE_CONVEX_URL is missing. Please add it to your Vercel Environment Variables.')
+  }
+
+  const convexQueryClient = new ConvexQueryClient(CONVEX_URL || 'https://anonymous-agent-3210.convex.cloud')
 
   const queryClient: QueryClient = new QueryClient({
     defaultOptions: {
