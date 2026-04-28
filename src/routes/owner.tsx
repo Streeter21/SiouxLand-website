@@ -14,6 +14,7 @@ function AdminPage() {
   const [isDemoMode, setIsDemoMode] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
   const [failCount, setFailCount] = useState(0)
+  const [lastError, setLastError] = useState<string | null>(null)
   
   const verify = useMutation(api.admin.verifyPassword)
   const resetPwd = useMutation(api.admin.resetPassword)
@@ -28,6 +29,7 @@ function AdminPage() {
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault()
     setIsVerifying(true)
+    setLastError(null)
     try {
       const isValid = await verify({ password })
       if (isValid) {
@@ -36,11 +38,11 @@ function AdminPage() {
         localStorage.setItem('siouxland_admin_logged_in', 'true')
       } else {
         setFailCount(prev => prev + 1)
-        alert('Incorrect password. Default is: siouxland123')
+        setLastError('Incorrect password. Please try the default.')
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
-      alert('Network Error: Could not reach the business database.')
+      setLastError(err.message || 'Network Error: Could not reach the business database.')
     } finally {
       setIsVerifying(false)
     }
@@ -97,12 +99,18 @@ function AdminPage() {
                 disabled={isVerifying}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-5 focus:border-blue-600 focus:ring-0 outline-none transition-all text-lg font-bold text-slate-900 disabled:opacity-50 shadow-inner"
+                className={`w-full bg-slate-50 border-2 ${lastError ? 'border-red-500' : 'border-slate-100'} rounded-2xl px-6 py-5 focus:border-blue-600 focus:ring-0 outline-none transition-all text-lg font-bold text-slate-900 disabled:opacity-50 shadow-inner`}
               />
+              {lastError && (
+                <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-3 animate-bounce">
+                  ⚠ {lastError}
+                </p>
+              )}
             </div>
 
             <div className="pt-4">
               <button 
+                type="submit"
                 disabled={isVerifying}
                 className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-blue-500 transition-all shadow-2xl shadow-blue-600/40 active:scale-95 disabled:bg-slate-400"
               >
@@ -147,6 +155,7 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
   const allReviewsRaw = useQuery(api.reviews.listAll, {})
   const galleryImagesRaw = useQuery(api.gallery.list, {})
 
+  const isLoading = quotesRaw === undefined || allReviewsRaw === undefined || galleryImagesRaw === undefined
   const quotes = quotesRaw || []
   const allReviews = allReviewsRaw || []
   const galleryImages = galleryImagesRaw || []
@@ -232,7 +241,12 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
       </div>
 
       <div className="max-w-7xl mx-auto p-6 md:p-12">
-        {activeTab === 'leads' && (
+        {isLoading ? (
+          <div className="py-24 text-center">
+            <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Loading Secure Data...</p>
+          </div>
+        ) : activeTab === 'leads' && (
           <div className="grid gap-8">
             {quotes.length === 0 ? (
                <div className="bg-white p-20 rounded-3xl border border-slate-200 text-center italic text-slate-400">No leads found in database.</div>
@@ -244,7 +258,7 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
           </div>
         )}
 
-        {activeTab === 'reviews' && (
+        {!isLoading && activeTab === 'reviews' && (
           <div className="grid md:grid-cols-2 gap-8">
             {allReviews.map(review => (
               <div key={review._id} className={`bg-white p-8 rounded-3xl border ${review.approved ? 'border-slate-200 shadow-sm' : 'border-blue-200 bg-blue-50/20 shadow-md'}`}>
@@ -264,7 +278,7 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
           </div>
         )}
 
-        {activeTab === 'gallery' && (
+        {!isLoading && activeTab === 'gallery' && (
           <div className="space-y-12">
             <div className="flex justify-between items-center">
                <h2 className="text-2xl font-black uppercase tracking-tighter">Manage Gallery</h2>
@@ -300,7 +314,7 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
           </div>
         )}
 
-        {activeTab === 'settings' && (
+        {!isLoading && activeTab === 'settings' && (
           <div className="space-y-12">
             <h2 className="text-2xl font-black uppercase tracking-tighter">Security Settings</h2>
             <div className="max-w-md bg-white p-10 rounded-3xl border border-slate-200 shadow-xl relative overflow-hidden">
