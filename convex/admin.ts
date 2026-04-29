@@ -143,27 +143,22 @@ export const changePassword = mutation({
 
 export const getSocialLinks = query({
   args: {},
-  returns: v.object({
-    jobber: v.string(),
-    facebook: v.string(),
-  }),
+  returns: v.any(),
   handler: async (ctx) => {
     try {
-      const jobberDoc = await ctx.db
-        .query('settings')
-        .withIndex('by_key', (q) => q.eq('key', 'social_jobber'))
-        .first()
-      const facebookDoc = await ctx.db
-        .query('settings')
-        .withIndex('by_key', (q) => q.eq('key', 'social_facebook'))
-        .first()
+      // Use collect() and filter in JS if index is missing/broken in prod
+      // but better to just try a safe query
+      const settings = await ctx.db.query('settings').collect();
+      
+      const jobber = settings.find(s => s.key === 'social_jobber')?.value ?? '';
+      const facebook = settings.find(s => s.key === 'social_facebook')?.value ?? '';
 
       return {
-        jobber: jobberDoc?.value ?? '',
-        facebook: facebookDoc?.value ?? '',
+        jobber,
+        facebook,
       }
     } catch (error) {
-      console.error('Error fetching social links:', error)
+      console.error('Safe fallback: Error fetching social links:', error)
       return { jobber: '', facebook: '' }
     }
   },
