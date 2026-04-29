@@ -6,26 +6,15 @@ import {
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 import * as React from 'react'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { convexQuery } from '@convex-dev/react-query'
+import { api } from '../../convex/_generated/api'
 import type { QueryClient } from '@tanstack/react-query'
 import appCss from '~/styles/app.css?url'
 
 function useSocialLinks() {
-  const [links, setLinks] = React.useState<{
-    jobber: string
-    facebook: string
-  }>({ jobber: '', facebook: '' })
-
-  React.useEffect(() => {
-    // Load social links from localStorage (set by admin dashboard)
-    const stored = localStorage.getItem('siouxland_social_links')
-    if (stored) {
-      try {
-        setLinks(JSON.parse(stored))
-      } catch {}
-    }
-  }, [])
-
-  return links
+  const { data } = useSuspenseQuery(convexQuery(api.admin.getSocialLinks, {}))
+  return data
 }
 
 export const Route = createRootRouteWithContext<{
