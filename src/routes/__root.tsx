@@ -8,7 +8,8 @@ import {
 import * as React from 'react'
 import type { QueryClient } from '@tanstack/react-query'
 import appCss from '~/styles/app.css?url'
-import { useQuery } from 'convex/react'
+import { useQuery } from '@tanstack/react-query'
+import { convexQuery } from '@convex-dev/react-query'
 import { api } from '../../convex/_generated/api'
 
 export const Route = createRootRouteWithContext<{
@@ -87,7 +88,10 @@ function TruckLogo() {
 }
 
 function RootComponent() {
-  const socialLinks = useQuery(api.admin.getSocialLinks) || { jobber: '', facebook: '' }
+  const { data: socialLinksRaw } = useQuery(
+    convexQuery(api.admin.getSocialLinks, {}),
+  )
+  const socialLinks = socialLinksRaw || { jobber: '', facebook: '' }
 
   return (
     <RootDocument>
