@@ -193,7 +193,6 @@ function AdminDashboard({
   const quotes = quotesRaw || []
   const allReviews = allReviewsRaw || []
   const galleryImages = galleryImagesRaw || []
-  const socialLinks = socialLinksRaw || { jobber: '', facebook: '' }
 
   // Settings tab state
   const [oldPassword, setOldPassword] = useState('')
