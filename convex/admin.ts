@@ -152,14 +152,18 @@ export const getSocialLinks = query({
       
       const jobber = settings.find(s => s.key === 'social_jobber')?.value ?? '';
       const facebook = settings.find(s => s.key === 'social_facebook')?.value ?? '';
+      const instagram = settings.find(s => s.key === 'social_instagram')?.value ?? '';
+      const tiktok = settings.find(s => s.key === 'social_tiktok')?.value ?? '';
 
       return {
         jobber,
         facebook,
+        instagram,
+        tiktok,
       }
     } catch (error) {
       console.error('Safe fallback: Error fetching social links:', error)
-      return { jobber: '', facebook: '' }
+      return { jobber: '', facebook: '', instagram: '', tiktok: '' }
     }
   },
 })
@@ -168,6 +172,8 @@ export const updateSocialLinks = mutation({
   args: {
     jobber: v.optional(v.string()),
     facebook: v.optional(v.string()),
+    instagram: v.optional(v.string()),
+    tiktok: v.optional(v.string()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -190,6 +196,8 @@ export const updateSocialLinks = mutation({
 
     await updateSetting('social_jobber', args.jobber)
     await updateSetting('social_facebook', args.facebook)
+    await updateSetting('social_instagram', args.instagram)
+    await updateSetting('social_tiktok', args.tiktok)
 
     return null
   },

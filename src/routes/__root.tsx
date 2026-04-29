@@ -91,7 +91,7 @@ function RootComponent() {
   const { data: socialLinksRaw } = useQuery(
     convexQuery(api.admin.getSocialLinks, {}),
   )
-  const socialLinks = socialLinksRaw || { jobber: '', facebook: '' }
+  const socialLinks = socialLinksRaw || { jobber: '', facebook: '', instagram: '', tiktok: '' }
 
   return (
     <RootDocument>
@@ -216,8 +216,8 @@ function RootComponent() {
                     siouxlandcoc@gmail.com
                   </a>
                 </li>
-                {(socialLinks.jobber || socialLinks.facebook) && (
-                  <li className="pt-2 flex gap-3">
+                {(socialLinks.jobber || socialLinks.facebook || socialLinks.instagram || socialLinks.tiktok) && (
+                  <li className="pt-2 flex flex-wrap gap-3">
                     {socialLinks.jobber && socialLinks.jobber !== '' && (
                       <a
                         href={socialLinks.jobber}
@@ -236,6 +236,26 @@ function RootComponent() {
                         className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
                       >
                         Facebook
+                      </a>
+                    )}
+                    {socialLinks.instagram && socialLinks.instagram !== '' && (
+                      <a
+                        href={socialLinks.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-pink-600/20 hover:bg-pink-600/40 text-pink-400 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
+                      >
+                        Instagram
+                      </a>
+                    )}
+                    {socialLinks.tiktok && socialLinks.tiktok !== '' && (
+                      <a
+                        href={socialLinks.tiktok}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-slate-600/20 hover:bg-slate-600/40 text-white px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
+                      >
+                        TikTok
                       </a>
                     )}
                   </li>

@@ -8,7 +8,7 @@ export const Route = createFileRoute('/admin')({
   component: AdminPage,
 })
 
-function AdminPage() {
+export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [activeTab, setActiveTab] = useState<
@@ -202,6 +202,8 @@ function AdminDashboard({
   
   const [jobberUrl, setJobberUrl] = useState('')
   const [facebookUrl, setFacebookUrl] = useState('')
+  const [instagramUrl, setInstagramUrl] = useState('')
+  const [tiktokUrl, setTiktokUrl] = useState('')
   const [isSavingLinks, setIsSavingLinks] = useState(false)
 
   // Sync social links from database
@@ -209,6 +211,8 @@ function AdminDashboard({
     if (socialLinksRaw) {
       setJobberUrl(socialLinksRaw.jobber || '')
       setFacebookUrl(socialLinksRaw.facebook || '')
+      setInstagramUrl(socialLinksRaw.instagram || '')
+      setTiktokUrl(socialLinksRaw.tiktok || '')
     }
   }, [socialLinksRaw])
 
@@ -298,7 +302,7 @@ function AdminDashboard({
                 label: 'Photo Gallery',
                 count: galleryImages.length,
               },
-              { id: 'settings', label: 'Security Settings', count: null },
+              { id: 'settings', label: 'Business Settings', count: null },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -459,7 +463,7 @@ function AdminDashboard({
         {!isLoading && activeTab === 'settings' && (
           <div className="space-y-12">
             <h2 className="text-2xl font-black uppercase tracking-tighter">
-              Security Settings
+              Business & Security
             </h2>
             <div className="max-w-md bg-white p-10 rounded-3xl border border-slate-200 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-blue-600"></div>
@@ -525,6 +529,8 @@ function AdminDashboard({
                     await updateSocialLinks({
                       jobber: jobberUrl || undefined,
                       facebook: facebookUrl || undefined,
+                      instagram: instagramUrl || undefined,
+                      tiktok: tiktokUrl || undefined,
                     })
                     alert('Social links updated!')
                   } catch (err) {
@@ -559,6 +565,30 @@ function AdminDashboard({
                     value={facebookUrl}
                     onChange={(e) => setFacebookUrl(e.target.value)}
                     placeholder="https://www.facebook.com/..."
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">
+                    Instagram URL
+                  </label>
+                  <input
+                    type="url"
+                    value={instagramUrl}
+                    onChange={(e) => setInstagramUrl(e.target.value)}
+                    placeholder="https://www.instagram.com/..."
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">
+                    TikTok URL
+                  </label>
+                  <input
+                    type="url"
+                    value={tiktokUrl}
+                    onChange={(e) => setTiktokUrl(e.target.value)}
+                    placeholder="https://www.tiktok.com/@..."
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
                   />
                 </div>
