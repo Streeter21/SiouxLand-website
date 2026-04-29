@@ -1,6 +1,8 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
-import { useMutation, useQuery } from 'convex/react'
+import { useMutation } from 'convex/react'
+import { useQuery } from '@tanstack/react-query'
+import { convexQuery } from '@convex-dev/react-query'
 import { api } from '../../convex/_generated/api'
 import type { ChangeEvent, FormEvent } from 'react'
 
@@ -8,7 +10,7 @@ export const Route = createFileRoute('/admin')({
   component: AdminPage,
 })
 
-export default function AdminPage() {
+function AdminPage() {
   const [password, setPassword] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [activeTab, setActiveTab] = useState<
@@ -181,10 +183,12 @@ function AdminDashboard({
   setActiveTab: (tab: 'leads' | 'reviews' | 'gallery' | 'settings') => void
   onLogout: () => void
 }) {
-  const quotesRaw = useQuery(api.admin.list, {})
-  const allReviewsRaw = useQuery(api.reviews.listAll, {})
-  const galleryImagesRaw = useQuery(api.gallery.list, {})
-  const socialLinksRaw = useQuery(api.admin.getSocialLinks, {})
+  const { data: quotesRaw } = useQuery(convexQuery(api.admin.list, {}))
+  const { data: allReviewsRaw } = useQuery(convexQuery(api.reviews.listAll, {}))
+  const { data: galleryImagesRaw } = useQuery(convexQuery(api.gallery.list, {}))
+  const { data: socialLinksRaw } = useQuery(
+    convexQuery(api.admin.getSocialLinks, {}),
+  )
 
   const isLoading =
     quotesRaw === undefined ||
@@ -839,3 +843,5 @@ function LeadCard({ quote, updateQuote }: { quote: any; updateQuote: any }) {
     </div>
   )
 }
+
+export default AdminPage

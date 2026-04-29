@@ -26,19 +26,24 @@ export const list = query({
     }),
   ),
   handler: async (ctx) => {
-    const quotes = await ctx.db.query('quotes').order('desc').collect()
-    return quotes.map((q) => ({
-      ...q,
-      name: q.name || 'Unknown',
-      email: q.email || 'No Email',
-      phone: q.phone || 'No Phone',
-      description: q.description || '',
-      heavyObjects: !!q.heavyObjects,
-      stairs: !!q.stairs,
-      smallSpaces: !!q.smallSpaces,
-      other: !!q.other,
-      imageIds: Array.isArray(q.imageIds) ? q.imageIds : [],
-    }))
+    try {
+      const quotes = await ctx.db.query('quotes').order('desc').collect()
+      return quotes.map((q) => ({
+        ...q,
+        name: q.name || 'Unknown',
+        email: q.email || 'No Email',
+        phone: q.phone || 'No Phone',
+        description: q.description || '',
+        heavyObjects: !!q.heavyObjects,
+        stairs: !!q.stairs,
+        smallSpaces: !!q.smallSpaces,
+        other: !!q.other,
+        imageIds: Array.isArray(q.imageIds) ? q.imageIds : [],
+      }))
+    } catch (error) {
+      console.error('Error fetching leads:', error)
+      return []
+    }
   },
 })
 

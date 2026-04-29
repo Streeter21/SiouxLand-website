@@ -68,15 +68,20 @@ export const listAll = query({
     }),
   ),
   handler: async (ctx) => {
-    const reviews = await ctx.db.query('reviews').order('desc').collect()
-    return reviews.map((r) => ({
-      _id: r._id,
-      _creationTime: r._creationTime,
-      name: r.name,
-      rating: r.rating,
-      comment: r.comment,
-      approved: r.approved,
-    }))
+    try {
+      const reviews = await ctx.db.query('reviews').order('desc').collect()
+      return reviews.map((r) => ({
+        _id: r._id,
+        _creationTime: r._creationTime,
+        name: r.name || 'Anonymous',
+        rating: r.rating || 5,
+        comment: r.comment || '',
+        approved: !!r.approved,
+      }))
+    } catch (error) {
+      console.error('Error listing all reviews:', error)
+      return []
+    }
   },
 })
 
