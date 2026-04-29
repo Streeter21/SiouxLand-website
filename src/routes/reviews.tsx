@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { useMutation } from 'convex/react'
+import { useState, useEffect } from 'react'
+import { useMutation, useQuery as useConvexQuery, useConvexAuth } from 'convex/react'
 import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
 import { api } from '../../convex/_generated/api'
@@ -10,6 +10,8 @@ export const Route = createFileRoute('/reviews')({
 })
 
 function ReviewsPage() {
+  const { isAuthenticated } = useConvexAuth()
+  const user = useConvexQuery((api as any).users?.viewer || (api as any).auth?.auth?.viewer, {})
   const submitReview = useMutation(api.reviews.submit)
 
   const [formData, setFormData] = useState({
@@ -17,6 +19,12 @@ function ReviewsPage() {
     rating: 5,
     comment: '',
   })
+
+  useEffect(() => {
+    if (user && isAuthenticated) {
+      setFormData(prev => ({ ...prev, name: user.name || '' }))
+    }
+  }, [user, isAuthenticated])
   const [submitted, setSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -165,7 +173,17 @@ function ReviewList() {
             ))}
           </div>
           <p className="text-lg text-slate-800 mb-6 font-medium leading-relaxed">"{review.comment}"</p>
-          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">— {review.name}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">— {review.name}</p>
+            {review.userId && (
+              <span className="flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                Verified Customer
+              </span>
+            )}
+          </div>
         </div>
       ))}
     </div>

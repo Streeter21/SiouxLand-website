@@ -1,5 +1,6 @@
-import { mutation, query } from "./_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
 
 export const submit = mutation({
   args: {
@@ -16,8 +17,10 @@ export const submit = mutation({
   },
   returns: v.id("quotes"),
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
     return await ctx.db.insert("quotes", {
       ...args,
+      userId: userId ?? undefined,
       status: "pending",
       customerAccepted: false,
     });
@@ -76,6 +79,20 @@ export const customerAction = mutation({
       });
     }
     return null;
+  },
+});
+
+export const listMyQuotes = query({
+  args: {},
+  returns: v.array(v.any()),
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+    return await ctx.db
+      .query("quotes")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
   },
 });
 

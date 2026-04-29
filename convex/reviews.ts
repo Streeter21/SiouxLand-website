@@ -1,5 +1,6 @@
-import { mutation, query } from "./_generated/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
 
 export const list = query({
   args: {},
@@ -10,6 +11,7 @@ export const list = query({
     rating: v.number(),
     comment: v.string(),
     approved: v.boolean(),
+    userId: v.optional(v.id("users")),
   })),
   handler: async (ctx) => {
     const reviews = await ctx.db
@@ -23,10 +25,11 @@ export const list = query({
     return reviews.map(r => ({
       _id: r._id,
       _creationTime: r._creationTime,
-      name: r.name ?? "Anonymous",
-      rating: r.rating ?? 5,
-      comment: r.comment ?? "",
-      approved: r.approved ?? true,
+      name: r.name,
+      rating: r.rating,
+      comment: r.comment,
+      approved: r.approved,
+      userId: r.userId,
     }));
   },
 });
@@ -39,8 +42,10 @@ export const submit = mutation({
   },
   returns: v.id("reviews"),
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
     return await ctx.db.insert("reviews", {
       ...args,
+      userId: userId ?? undefined,
       approved: false, // Default to false so owner can review
     });
   },
@@ -64,16 +69,18 @@ export const listAll = query({
     rating: v.number(),
     comment: v.string(),
     approved: v.boolean(),
+    userId: v.optional(v.id("users")),
   })),
   handler: async (ctx) => {
     const reviews = await ctx.db.query("reviews").order("desc").collect();
     return reviews.map(r => ({
       _id: r._id,
       _creationTime: r._creationTime,
-      name: r.name ?? "Anonymous",
-      rating: r.rating ?? 5,
-      comment: r.comment ?? "",
-      approved: r.approved ?? false,
+      name: r.name,
+      rating: r.rating,
+      comment: r.comment,
+      approved: r.approved,
+      userId: r.userId,
     }));
   },
 });

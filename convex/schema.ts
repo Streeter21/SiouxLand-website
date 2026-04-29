@@ -1,8 +1,11 @@
+import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  ...authTables,
   quotes: defineTable({
+    userId: v.optional(v.id("users")),
     name: v.string(),
     email: v.string(),
     phone: v.string(),
@@ -19,19 +22,21 @@ export default defineSchema({
     price: v.optional(v.string()),
     customerAccepted: v.optional(v.boolean()),
     customerNotes: v.optional(v.string()),
-  }),
+  }).index("by_userId", ["userId"]),
   gallery: defineTable({
     storageId: v.id("_storage"),
     caption: v.optional(v.string()),
   }),
   reviews: defineTable({
+    userId: v.optional(v.id("users")),
     name: v.string(),
     rating: v.number(),
     comment: v.string(),
     approved: v.boolean(),
-  }).index("by_approved", ["approved"]),
+  }).index("by_approved", ["approved"])
+    .index("by_userId", ["userId"]),
   settings: defineTable({
-    key: v.string(), // e.g., "adminPassword"
+    key: v.string(), // e.g., "adminPassword", "facebook", "instagram", "twitter"
     value: v.string(),
   }).index("by_key", ["key"]),
 });

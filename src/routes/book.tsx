@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as React from 'react'
 import { useState, useRef } from 'react'
-import { useMutation } from 'convex/react'
+import { useMutation, useConvexAuth } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
 export const Route = createFileRoute('/book')({
@@ -9,6 +9,7 @@ export const Route = createFileRoute('/book')({
 })
 
 function BookPage() {
+  const { isAuthenticated } = useConvexAuth()
   const submitQuote = useMutation(api.quotes.submit)
   const generateUploadUrl = useMutation(api.quotes.generateUploadUrl)
 
@@ -23,7 +24,7 @@ function BookPage() {
     smallSpaces: false,
     other: false,
   })
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [selectedFiles, setSelectedFiles] = useState<Array<File>>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [quoteId, setQuoteId] = useState<string | null>(null)
@@ -101,16 +102,36 @@ function BookPage() {
                 <h4 className="text-3xl font-black uppercase tracking-tighter mb-4">Request Received!</h4>
                 <p className="text-slate-600 mb-8">Thanks for reaching out. We'll review your job and contact you within 24 hours.</p>
                 
-                {quoteId && (
+                {quoteId && !isAuthenticated && (
+                  <div className="mb-12 p-8 bg-blue-600 text-white rounded-[2rem] shadow-xl shadow-blue-600/20">
+                    <h5 className="font-black uppercase tracking-widest text-sm mb-4">Want to track this booking?</h5>
+                    <p className="text-blue-100 text-xs mb-8 leading-relaxed">Create an account using the same email you used for this quote to view your status, history, and chat with our team.</p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Link 
+                        to={"/signup" as any} 
+                        className="bg-white text-blue-600 px-8 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-blue-50 transition-all"
+                      >
+                        Create Account
+                      </Link>
+                      <Link 
+                        to="/status/$quoteId" 
+                        params={{ quoteId: quoteId as any }}
+                        className="bg-blue-500 text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-blue-400 transition-all border border-blue-400"
+                      >
+                        Guest View Status →
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                {quoteId && isAuthenticated && (
                   <div className="mb-12 p-6 bg-blue-50 rounded-2xl border border-blue-100">
-                    <p className="text-sm text-blue-900 font-bold mb-4 uppercase tracking-widest">Your Private Status Link</p>
-                    <p className="text-xs text-blue-700 mb-6">Bookmark this page to see when we reply with your price and date:</p>
+                    <p className="text-sm text-blue-900 font-bold mb-4 uppercase tracking-widest">Quote Added to Your Dashboard</p>
                     <Link 
-                      to="/status/$quoteId" 
-                      params={{ quoteId }}
-                      className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-blue-700 transition-all"
+                      to={"/dashboard" as any} 
+                      className="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-blue-700 transition-all"
                     >
-                      View Your Quote Status →
+                      Go to My Dashboard →
                     </Link>
                   </div>
                 )}
@@ -123,125 +144,139 @@ function BookPage() {
                 </button>
               </div>
             ) : (
-              <form className="space-y-10" onSubmit={handleSubmit}>
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Full Name</label>
-                    <input 
-                      required
-                      type="text" 
-                      value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
-                      placeholder="Enter your name"
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Phone Number</label>
-                    <input 
-                      required
-                      type="tel" 
-                      value={formData.phone}
-                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
-                      placeholder="(712) 000-0000"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Email Address</label>
-                    <input 
-                      required
-                      type="email" 
-                      value={formData.email}
-                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Job Location / City</label>
-                    <input 
-                      required
-                      type="text" 
-                      value={formData.location}
-                      onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
-                      placeholder="e.g. Sioux City, IA"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 block">Job Factors (Check all that apply)</label>
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { id: 'heavyObjects', label: 'Heavy Objects' },
-                      { id: 'stairs', label: 'Stairs Involved' },
-                      { id: 'smallSpaces', label: 'Small Spaces' },
-                      { id: 'other', label: 'Other Special Case' }
-                    ].map(item => (
-                      <label key={item.id} className="flex items-center p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors group">
-                        <input 
-                          type="checkbox" 
-                          checked={(formData as any)[item.id]}
-                          onChange={(e) => setFormData(prev => ({ ...prev, [item.id]: e.target.checked }))}
-                          className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500" 
-                        />
-                        <span className="ml-4 text-sm font-bold text-slate-600 group-hover:text-slate-900">{item.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">What needs to go?</label>
-                  <textarea 
-                    required
-                    value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 min-h-[160px] focus:ring-2 focus:ring-blue-600 outline-none transition-all"
-                    placeholder="Describe the items or the space you need cleared..."
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Add Photos (Recommended)</label>
-                  <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center hover:border-blue-400 transition-all cursor-pointer bg-slate-50/50"
-                  >
-                    <input 
-                      type="file" 
-                      multiple 
-                      ref={fileInputRef} 
-                      onChange={handleFileChange} 
-                      className="hidden" 
-                    />
-                    <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
+              <div className="space-y-12">
+                {!isAuthenticated && (
+                   <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+                      <div className="text-center sm:text-left">
+                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Already a customer?</p>
+                         <p className="text-sm font-bold text-slate-900">Log in to auto-fill your details</p>
+                      </div>
+                      <Link to={"/login" as any} className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-600 hover:text-blue-600 transition-all">
+                        Customer Login
+                      </Link>
+                   </div>
+                )}
+                
+                <form className="space-y-10" onSubmit={handleSubmit}>
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Full Name</label>
+                      <input 
+                        required
+                        type="text" 
+                        value={formData.name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                        placeholder="Enter your name"
+                      />
                     </div>
-                    <p className="font-bold text-slate-700">
-                      {selectedFiles.length > 0 
-                        ? `${selectedFiles.length} photos selected` 
-                        : "Click to upload job photos"}
-                    </p>
-                    <p className="text-slate-400 text-xs mt-2 uppercase tracking-widest">Helps us give you a faster quote</p>
+                    <div className="space-y-3">
+                      <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Phone Number</label>
+                      <input 
+                        required
+                        type="tel" 
+                        value={formData.phone}
+                        onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                        className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                        placeholder="(712) 000-0000"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-600 text-white py-6 rounded-xl font-black uppercase tracking-[0.2em] hover:bg-blue-500 transition-all shadow-xl shadow-blue-600/20 disabled:bg-slate-300 disabled:shadow-none"
-                >
-                  {isSubmitting ? "Sending Request..." : "Request Quote"}
-                </button>
-              </form>
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Email Address</label>
+                      <input 
+                        required
+                        type="email" 
+                        value={formData.email}
+                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                        className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                        placeholder="you@example.com"
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Job Location / City</label>
+                      <input 
+                        required
+                        type="text" 
+                        value={formData.location}
+                        onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                        className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                        placeholder="e.g. Sioux City, IA"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 block">Job Factors (Check all that apply)</label>
+                    <div className="grid grid-cols-2 gap-4">
+                      {[
+                        { id: 'heavyObjects', label: 'Heavy Objects' },
+                        { id: 'stairs', label: 'Stairs Involved' },
+                        { id: 'smallSpaces', label: 'Small Spaces' },
+                        { id: 'other', label: 'Other Special Case' }
+                      ].map(item => (
+                        <label key={item.id} className="flex items-center p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors group">
+                          <input 
+                            type="checkbox" 
+                            checked={(formData as any)[item.id]}
+                            onChange={(e) => setFormData(prev => ({ ...prev, [item.id]: e.target.checked }))}
+                            className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500" 
+                          />
+                          <span className="ml-4 text-sm font-bold text-slate-600 group-hover:text-slate-900">{item.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">What needs to go?</label>
+                    <textarea 
+                      required
+                      value={formData.description}
+                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 min-h-[160px] focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                      placeholder="Describe the items or the space you need cleared..."
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Add Photos (Recommended)</label>
+                    <div 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center hover:border-blue-400 transition-all cursor-pointer bg-slate-50/50"
+                    >
+                      <input 
+                        type="file" 
+                        multiple 
+                        ref={fileInputRef} 
+                        onChange={handleFileChange} 
+                        className="hidden" 
+                      />
+                      <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <p className="font-bold text-slate-700">
+                        {selectedFiles.length > 0 
+                          ? `${selectedFiles.length} photos selected` 
+                          : "Click to upload job photos"}
+                      </p>
+                      <p className="text-slate-400 text-xs mt-2 uppercase tracking-widest">Helps us give you a faster quote</p>
+                    </div>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full bg-blue-600 text-white py-6 rounded-xl font-black uppercase tracking-[0.2em] hover:bg-blue-500 transition-all shadow-xl shadow-blue-600/20 disabled:bg-slate-300 disabled:shadow-none"
+                  >
+                    {isSubmitting ? "Sending Request..." : "Request Quote"}
+                  </button>
+                </form>
+              </div>
             )}
           </div>
         </div>

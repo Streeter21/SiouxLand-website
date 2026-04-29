@@ -166,7 +166,15 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isChanging, setIsChanging] = useState(false)
 
+  const settingsRaw = useQuery(api.admin.getSettings, {})
+  const settings = settingsRaw || []
+
+  const facebookUrl = settings.find(s => s.key === 'facebook')?.value || ''
+  const instagramUrl = settings.find(s => s.key === 'instagram')?.value || ''
+  const twitterUrl = settings.find(s => s.key === 'twitter')?.value || ''
+
   const changePwd = useMutation(api.admin.changePassword)
+  const updateSetting = useMutation(api.admin.updateSetting)
   const updateQuote = useMutation(api.admin.updateQuote)
   const approveReview = useMutation(api.reviews.approve)
   const deleteReview = useMutation(api.reviews.remove)
@@ -316,30 +324,77 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
 
         {!isLoading && activeTab === 'settings' && (
           <div className="space-y-12">
-            <h2 className="text-2xl font-black uppercase tracking-tighter">Security Settings</h2>
-            <div className="max-w-md bg-white p-10 rounded-3xl border border-slate-200 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-2 bg-blue-600"></div>
-              <form onSubmit={handlePasswordChange} className="space-y-8">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Update Portal Password</p>
-                <div>
-                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Current Password</label>
-                  <input type="password" required value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+            <h2 className="text-2xl font-black uppercase tracking-tighter">Manage Business Settings</h2>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Password Settings */}
+              <div className="bg-white p-10 rounded-3xl border border-slate-200 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-2 bg-blue-600"></div>
+                <form onSubmit={handlePasswordChange} className="space-y-8">
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Update Portal Password</p>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Current Password</label>
+                    <input type="password" required value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">New Secret Password</label>
+                    <input type="password" required value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Confirm New Password</label>
+                    <input type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  </div>
+                  <button 
+                    disabled={isChanging}
+                    className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-600/20 hover:bg-blue-500 transition-all disabled:bg-slate-300"
+                  >
+                    {isChanging ? 'Saving Changes...' : 'Update Password'}
+                  </button>
+                </form>
+              </div>
+
+              {/* Social Media Settings */}
+              <div className="bg-white p-10 rounded-3xl border border-slate-200 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-2 bg-green-500"></div>
+                <div className="space-y-8">
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Social Media Links</p>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Facebook URL</label>
+                      <input 
+                        type="url" 
+                        placeholder="https://facebook.com/..." 
+                        value={facebookUrl} 
+                        onChange={(e) => updateSetting({ key: 'facebook', value: e.target.value })} 
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all" 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Instagram URL</label>
+                      <input 
+                        type="url" 
+                        placeholder="https://instagram.com/..." 
+                        value={instagramUrl} 
+                        onChange={(e) => updateSetting({ key: 'instagram', value: e.target.value })} 
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all" 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Twitter/X URL</label>
+                      <input 
+                        type="url" 
+                        placeholder="https://twitter.com/..." 
+                        value={twitterUrl} 
+                        onChange={(e) => updateSetting({ key: 'twitter', value: e.target.value })} 
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all" 
+                      />
+                    </div>
+                  </div>
+                  
+                  <p className="text-[9px] text-slate-400 font-medium italic">Changes are saved automatically as you type.</p>
                 </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">New Secret Password</label>
-                  <input type="password" required value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Confirm New Password</label>
-                  <input type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
-                </div>
-                <button 
-                  disabled={isChanging}
-                  className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-600/20 hover:bg-blue-500 transition-all disabled:bg-slate-300"
-                >
-                  {isChanging ? 'Saving Changes...' : 'Update Password'}
-                </button>
-              </form>
+              </div>
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
-import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
 
 export const list = query({
   args: {},
@@ -51,7 +51,7 @@ export const updateQuote = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
+    await ctx.db.patch("quotes", id, updates);
     return null;
   },
 });
@@ -104,7 +104,7 @@ export const resetPassword = mutation({
     
     // Clean up duplicates if they exist
     for (const s of settings) {
-      await ctx.db.delete(s._id);
+      await ctx.db.delete("settings", s._id);
     }
     
     await ctx.db.insert("settings", { key: "adminPassword", value: "siouxland123" });
@@ -128,11 +128,37 @@ export const changePassword = mutation({
     }
     
     if (setting) {
-      await ctx.db.patch(setting._id, { value: args.newPassword });
+      await ctx.db.patch("settings", setting._id, { value: args.newPassword });
     } else {
       await ctx.db.insert("settings", { key: "adminPassword", value: args.newPassword });
     }
     
     return { success: true, message: "Password updated successfully" };
+  },
+});
+
+export const getSettings = query({
+  args: {},
+  returns: v.array(v.object({ key: v.string(), value: v.string() })),
+  handler: async (ctx) => {
+    return await ctx.db.query("settings").collect();
+  },
+});
+
+export const updateSetting = mutation({
+  args: { key: v.string(), value: v.string() },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const setting = await ctx.db
+      .query("settings")
+      .withIndex("by_key", (q) => q.eq("key", args.key))
+      .first();
+    
+    if (setting) {
+      await ctx.db.patch("settings", setting._id, { value: args.value });
+    } else {
+      await ctx.db.insert("settings", { key: args.key, value: args.value });
+    }
+    return null;
   },
 });
