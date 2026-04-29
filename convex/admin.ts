@@ -148,18 +148,23 @@ export const getSocialLinks = query({
     facebook: v.string(),
   }),
   handler: async (ctx) => {
-    const jobberDoc = await ctx.db
-      .query('settings')
-      .withIndex('by_key', (q) => q.eq('key', 'social_jobber'))
-      .first()
-    const facebookDoc = await ctx.db
-      .query('settings')
-      .withIndex('by_key', (q) => q.eq('key', 'social_facebook'))
-      .first()
+    try {
+      const jobberDoc = await ctx.db
+        .query('settings')
+        .withIndex('by_key', (q) => q.eq('key', 'social_jobber'))
+        .first()
+      const facebookDoc = await ctx.db
+        .query('settings')
+        .withIndex('by_key', (q) => q.eq('key', 'social_facebook'))
+        .first()
 
-    return {
-      jobber: jobberDoc?.value ?? '',
-      facebook: facebookDoc?.value ?? '',
+      return {
+        jobber: jobberDoc?.value ?? '',
+        facebook: facebookDoc?.value ?? '',
+      }
+    } catch (error) {
+      console.error('Error fetching social links:', error)
+      return { jobber: '', facebook: '' }
     }
   },
 })
