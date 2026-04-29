@@ -24,7 +24,11 @@ function ReviewsPage() {
     e.preventDefault()
     setIsSubmitting(true)
     try {
-      await submitReview(formData)
+      await submitReview({
+        name: formData.name,
+        rating: formData.rating,
+        comment: formData.comment,
+      })
       setSubmitted(true)
       setFormData({ name: '', rating: 5, comment: '' })
     } catch (error: any) {
@@ -65,6 +69,10 @@ function ReviewsPage() {
                   </div>
                   <p className="text-sm font-bold uppercase tracking-widest mb-2">Review Submitted!</p>
                   <p className="text-slate-400 text-xs">It will appear on the site once approved by the owner.</p>
+                  <div className="mt-4 p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                    <p className="text-slate-400 text-xs">Want to track your reviews and bookings?</p>
+                    <a href="/signup" className="text-blue-400 text-xs font-bold hover:text-blue-300">Create a free account →</a>
+                  </div>
                   <button 
                     onClick={() => setSubmitted(false)}
                     className="mt-8 text-[10px] uppercase tracking-[0.2em] font-black text-blue-400 hover:text-blue-300 transition-colors"
@@ -165,7 +173,14 @@ function ReviewList() {
             ))}
           </div>
           <p className="text-lg text-slate-800 mb-6 font-medium leading-relaxed">"{review.comment}"</p>
-          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">— {review.name}</p>
+          <div className="flex items-center gap-3">
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">— {review.name}</p>
+            {review.userId && (
+              <span className="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">
+                ✓ Verified Customer
+              </span>
+            )}
+          </div>
         </div>
       ))}
     </div>

@@ -3,6 +3,7 @@ import { v } from "convex/values";
 
 export default defineSchema({
   quotes: defineTable({
+    userId: v.optional(v.string()),
     name: v.string(),
     email: v.string(),
     phone: v.string(),
@@ -13,7 +14,7 @@ export default defineSchema({
     other: v.boolean(),
     imageIds: v.array(v.id("_storage")),
     location: v.optional(v.string()),
-    status: v.optional(v.string()), // "pending", "booked", "completed", "cancelled"
+    status: v.optional(v.string()),
     scheduledDate: v.optional(v.string()),
     scheduledTime: v.optional(v.string()),
     price: v.optional(v.string()),
@@ -25,13 +26,14 @@ export default defineSchema({
     caption: v.optional(v.string()),
   }),
   reviews: defineTable({
+    userId: v.optional(v.string()),
     name: v.string(),
     rating: v.number(),
     comment: v.string(),
     approved: v.boolean(),
   }).index("by_approved", ["approved"]),
   settings: defineTable({
-    key: v.string(), // e.g., "adminPassword"
+    key: v.string(),
     value: v.string(),
   }).index("by_key", ["key"]),
 });

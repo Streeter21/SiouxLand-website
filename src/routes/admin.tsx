@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState, useRef, useEffect, type FormEvent } from 'react'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import type { FormEvent } from 'react'
 
 export const Route = createFileRoute('/admin')({
   component: AdminPage,
@@ -10,12 +11,14 @@ export const Route = createFileRoute('/admin')({
 function AdminPage() {
   const [password, setPassword] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [activeTab, setActiveTab] = useState<'leads' | 'reviews' | 'gallery' | 'settings'>('leads')
+  const [activeTab, setActiveTab] = useState<
+    'leads' | 'reviews' | 'gallery' | 'settings' | 'social'
+  >('leads')
   const [isDemoMode, setIsDemoMode] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
   const [failCount, setFailCount] = useState(0)
   const [lastError, setLastError] = useState<string | null>(null)
-  
+
   const verify = useMutation(api.admin.verifyPassword)
   const resetPwd = useMutation(api.admin.resetPassword)
 
@@ -37,19 +40,21 @@ function AdminPage() {
         setFailCount(0)
         localStorage.setItem('siouxland_admin_logged_in', 'true')
       } else {
-        setFailCount(prev => prev + 1)
+        setFailCount((prev) => prev + 1)
         setLastError('Incorrect password. Please try the default.')
       }
     } catch (err: any) {
       console.error(err)
-      setLastError(err.message || 'Network Error: Could not reach the business database.')
+      setLastError(
+        err.message || 'Network Error: Could not reach the business database.',
+      )
     } finally {
       setIsVerifying(false)
     }
   }
 
   const handleRecovery = async () => {
-    const secret = window.prompt("Enter Recovery Key (RECOVER_ACCESS_2024):")
+    const secret = window.prompt('Enter Recovery Key (RECOVER_ACCESS_2024):')
     if (secret) {
       const msg = await resetPwd({ secret })
       alert(msg)
@@ -67,34 +72,52 @@ function AdminPage() {
   }
 
   if (isLoggedIn) {
-    return <AdminDashboard activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout} />
+    return (
+      <AdminDashboard
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onLogout={handleLogout}
+      />
+    )
   }
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md text-center">
         <div className="mb-12 p-6 bg-blue-600/10 border border-blue-500/20 rounded-3xl text-left backdrop-blur-sm">
-           <div className="flex items-center gap-3 mb-4">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Database Connection Active</p>
-           </div>
-           <p className="text-[8px] font-mono text-slate-500 break-all leading-relaxed opacity-50">
-             CONVEX_URL: {import.meta.env.VITE_CONVEX_URL || 'Using Safety Fallback'}
-           </p>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">
+              Database Connection Active
+            </p>
+          </div>
+          <p className="text-[8px] font-mono text-slate-500 break-all leading-relaxed opacity-50">
+            CONVEX_URL:{' '}
+            {import.meta.env.VITE_CONVEX_URL || 'Using Safety Fallback'}
+          </p>
         </div>
 
-        <form onSubmit={handleLogin} className="bg-white p-10 rounded-[2.5rem] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.5)] text-left border-t-8 border-blue-600 relative overflow-hidden">
+        <form
+          onSubmit={handleLogin}
+          className="bg-white p-10 rounded-[2.5rem] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.5)] text-left border-t-8 border-blue-600 relative overflow-hidden"
+        >
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16"></div>
-          
-          <h1 className="text-4xl font-black uppercase tracking-tighter mb-2 text-slate-950 relative">Owner Access</h1>
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] mb-12 relative">SiouxLand Clean Out Crew</p>
-          
+
+          <h1 className="text-4xl font-black uppercase tracking-tighter mb-2 text-slate-950 relative">
+            Owner Access
+          </h1>
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] mb-12 relative">
+            SiouxLand Clean Out Crew
+          </p>
+
           <div className="space-y-8">
             <div>
-              <label className="text-[10px] uppercase font-black text-slate-400 mb-3 block tracking-widest">Admin Password</label>
-              <input 
-                type="password" 
-                placeholder="••••••••" 
+              <label className="text-[10px] uppercase font-black text-slate-400 mb-3 block tracking-widest">
+                Admin Password
+              </label>
+              <input
+                type="password"
+                placeholder="••••••••"
                 autoFocus
                 disabled={isVerifying}
                 value={password}
@@ -109,7 +132,7 @@ function AdminPage() {
             </div>
 
             <div className="pt-4">
-              <button 
+              <button
                 type="submit"
                 disabled={isVerifying}
                 className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-blue-500 transition-all shadow-2xl shadow-blue-600/40 active:scale-95 disabled:bg-slate-400"
@@ -122,22 +145,25 @@ function AdminPage() {
 
         <div className="mt-12 space-y-6">
           {failCount > 1 && (
-            <button 
+            <button
               onClick={handleRecovery}
               className="block w-full text-blue-500 hover:text-blue-400 text-[10px] uppercase tracking-widest font-black transition-all bg-white/5 py-3 rounded-xl border border-white/5"
             >
               Forgot Password? Click to Recover
             </button>
           )}
-          
-          <button 
+
+          <button
             onClick={() => setIsDemoMode(true)}
             className="text-white/20 hover:text-white/50 text-[10px] uppercase tracking-widest font-black transition-all"
           >
             Launch Site Simulator
           </button>
-          
-          <Link to="/" className="block text-white/10 hover:text-white/30 text-[10px] uppercase tracking-[0.3em] font-bold transition-colors">
+
+          <Link
+            to="/"
+            className="block text-white/10 hover:text-white/30 text-[10px] uppercase tracking-[0.3em] font-bold transition-colors"
+          >
             ← Exit to Public Site
           </Link>
         </div>
@@ -146,25 +172,46 @@ function AdminPage() {
   )
 }
 
-function AdminDashboard({ activeTab, setActiveTab, onLogout }: { 
-  activeTab: 'leads' | 'reviews' | 'gallery' | 'settings', 
-  setActiveTab: (tab: 'leads' | 'reviews' | 'gallery' | 'settings') => void,
+function AdminDashboard({
+  activeTab,
+  setActiveTab,
+  onLogout,
+}: {
+  activeTab: 'leads' | 'reviews' | 'gallery' | 'settings' | 'social'
+  setActiveTab: (
+    tab: 'leads' | 'reviews' | 'gallery' | 'settings' | 'social',
+  ) => void
   onLogout: () => void
 }) {
   const quotesRaw = useQuery(api.admin.list, {})
   const allReviewsRaw = useQuery(api.reviews.listAll, {})
   const galleryImagesRaw = useQuery(api.gallery.list, {})
+  const socialLinksRaw = useQuery(api.admin.getSocialLinks, {})
 
-  const isLoading = quotesRaw === undefined || allReviewsRaw === undefined || galleryImagesRaw === undefined
+  const isLoading =
+    quotesRaw === undefined ||
+    allReviewsRaw === undefined ||
+    galleryImagesRaw === undefined
   const quotes = quotesRaw || []
   const allReviews = allReviewsRaw || []
   const galleryImages = galleryImagesRaw || []
+  const socialLinks = socialLinksRaw || {
+    facebook: null,
+    instagram: null,
+    twitter: null,
+  }
 
   // Settings tab state
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isChanging, setIsChanging] = useState(false)
+
+  // Social links state
+  const [facebookUrl, setFacebookUrl] = useState(socialLinks.facebook || '')
+  const [instagramUrl, setInstagramUrl] = useState(socialLinks.instagram || '')
+  const [twitterUrl, setTwitterUrl] = useState(socialLinks.twitter || '')
+  const [isSavingSocial, setIsSavingSocial] = useState(false)
 
   const changePwd = useMutation(api.admin.changePassword)
   const updateQuote = useMutation(api.admin.updateQuote)
@@ -173,8 +220,19 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
   const generateUploadUrl = useMutation(api.quotes.generateUploadUrl)
   const addToGallery = useMutation(api.gallery.add)
   const deleteGalleryImage = useMutation(api.gallery.remove)
+  const updateSocialLink = useMutation(api.admin.updateSocialLink)
+  const removeSocialLink = useMutation(api.admin.removeSocialLink)
 
   const galleryInputRef = useRef<HTMLInputElement>(null)
+
+  // Update social link state when query loads
+  useEffect(() => {
+    if (socialLinksRaw) {
+      setFacebookUrl(socialLinksRaw.facebook || '')
+      setInstagramUrl(socialLinksRaw.instagram || '')
+      setTwitterUrl(socialLinksRaw.twitter || '')
+    }
+  }, [socialLinksRaw])
 
   const handlePasswordChange = async (e: FormEvent) => {
     e.preventDefault()
@@ -200,79 +258,172 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
     }
   }
 
+  const handleSocialLinkSave = async (e: FormEvent) => {
+    e.preventDefault()
+    setIsSavingSocial(true)
+    try {
+      if (facebookUrl)
+        await updateSocialLink({ platform: 'facebook', url: facebookUrl })
+      else await removeSocialLink({ platform: 'facebook' })
+
+      if (instagramUrl)
+        await updateSocialLink({ platform: 'instagram', url: instagramUrl })
+      else await removeSocialLink({ platform: 'instagram' })
+
+      if (twitterUrl)
+        await updateSocialLink({ platform: 'twitter', url: twitterUrl })
+      else await removeSocialLink({ platform: 'twitter' })
+
+      alert('Social links saved successfully!')
+    } catch (err) {
+      alert('Error saving social links')
+    } finally {
+      setIsSavingSocial(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Top Header */}
       <div className="bg-slate-950 text-white p-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6 border-b-4 border-blue-600">
-         <div className="flex items-center gap-4">
-            <div className="bg-blue-600 p-2 rounded-lg">
-               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-            </div>
-            <div>
-               <h1 className="text-xl font-black uppercase tracking-tighter">Business Dashboard</h1>
-               <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">SiouxLand COC Admin Portal</p>
-            </div>
-         </div>
-         <div className="flex items-center gap-6">
-            <button onClick={onLogout} className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-red-500 transition-colors">Log Out Account</button>
-         </div>
+        <div className="flex items-center gap-4">
+          <div className="bg-blue-600 p-2 rounded-lg">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-xl font-black uppercase tracking-tighter">
+              Business Dashboard
+            </h1>
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+              SiouxLand COC Admin Portal
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-6">
+          <button
+            onClick={onLogout}
+            className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-red-500 transition-colors"
+          >
+            Log Out Account
+          </button>
+        </div>
       </div>
 
       {/* Main Tabs */}
       <div className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-         <div className="max-w-7xl mx-auto px-6 overflow-x-auto">
-            <div className="flex space-x-8">
-               {[
-                 { id: 'leads', label: 'Leads & Bookings', count: quotes.length },
-                 { id: 'reviews', label: 'Reviews', count: allReviews.length },
-                 { id: 'gallery', label: 'Photo Gallery', count: galleryImages.length },
-                 { id: 'settings', label: 'Security Settings', count: null }
-               ].map(tab => (
-                 <button 
-                   key={tab.id}
-                   onClick={() => setActiveTab(tab.id as any)}
-                   className={`py-6 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all border-b-4 ${activeTab === tab.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
-                 >
-                   {tab.label} {tab.count !== null && <span className={`ml-2 px-2 py-0.5 rounded-full text-[8px] ${activeTab === tab.id ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'}`}>{tab.count}</span>}
-                 </button>
-               ))}
-            </div>
-         </div>
+        <div className="max-w-7xl mx-auto px-6 overflow-x-auto">
+          <div className="flex space-x-8">
+            {[
+              { id: 'leads', label: 'Leads & Bookings', count: quotes.length },
+              { id: 'reviews', label: 'Reviews', count: allReviews.length },
+              {
+                id: 'gallery',
+                label: 'Photo Gallery',
+                count: galleryImages.length,
+              },
+              { id: 'social', label: 'Social Media', count: null },
+              { id: 'settings', label: 'Security Settings', count: null },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`py-6 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all border-b-4 ${activeTab === tab.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+              >
+                {tab.label}{' '}
+                {tab.count !== null && (
+                  <span
+                    className={`ml-2 px-2 py-0.5 rounded-full text-[8px] ${activeTab === tab.id ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'}`}
+                  >
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto p-6 md:p-12">
         {isLoading ? (
           <div className="py-24 text-center">
             <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Loading Secure Data...</p>
+            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Loading Secure Data...
+            </p>
           </div>
-        ) : activeTab === 'leads' && (
-          <div className="grid gap-8">
-            {quotes.length === 0 ? (
-               <div className="bg-white p-20 rounded-3xl border border-slate-200 text-center italic text-slate-400">No leads found in database.</div>
-            ) : (
-               quotes.map(quote => (
-                 <LeadCard key={quote._id} quote={quote} updateQuote={updateQuote} />
-               ))
-            )}
-          </div>
+        ) : (
+          activeTab === 'leads' && (
+            <div className="grid gap-8">
+              {quotes.length === 0 ? (
+                <div className="bg-white p-20 rounded-3xl border border-slate-200 text-center italic text-slate-400">
+                  No leads found in database.
+                </div>
+              ) : (
+                quotes.map((quote) => (
+                  <LeadCard
+                    key={quote._id}
+                    quote={quote}
+                    updateQuote={updateQuote}
+                  />
+                ))
+              )}
+            </div>
+          )
         )}
 
         {!isLoading && activeTab === 'reviews' && (
           <div className="grid md:grid-cols-2 gap-8">
-            {allReviews.map(review => (
-              <div key={review._id} className={`bg-white p-8 rounded-3xl border ${review.approved ? 'border-slate-200 shadow-sm' : 'border-blue-200 bg-blue-50/20 shadow-md'}`}>
-                 <div className="flex justify-between items-center mb-6">
-                    <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded ${review.approved ? 'bg-slate-100 text-slate-400' : 'bg-blue-600 text-white animate-pulse'}`}>{review.approved ? 'Live' : 'Pending Approval'}</span>
-                    <button onClick={() => deleteReview({ id: review._id })} className="text-red-400 hover:text-red-600 text-[10px] uppercase font-black transition-colors">Delete</button>
-                 </div>
-                 <p className="text-slate-700 italic font-medium leading-relaxed mb-6">"{review.comment}"</p>
-                 <div className="flex justify-between items-end">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">— {review.name}</p>
-                    {!review.approved && (
-                      <button onClick={() => approveReview({ id: review._id })} className="bg-blue-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700">Approve</button>
+            {allReviews.map((review) => (
+              <div
+                key={review._id}
+                className={`bg-white p-8 rounded-3xl border ${review.approved ? 'border-slate-200 shadow-sm' : 'border-blue-200 bg-blue-50/20 shadow-md'}`}
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <span
+                    className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded ${review.approved ? 'bg-slate-100 text-slate-400' : 'bg-blue-600 text-white animate-pulse'}`}
+                  >
+                    {review.approved ? 'Live' : 'Pending Approval'}
+                  </span>
+                  <button
+                    onClick={() => deleteReview({ id: review._id })}
+                    className="text-red-400 hover:text-red-600 text-[10px] uppercase font-black transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+                <p className="text-slate-700 italic font-medium leading-relaxed mb-6">
+                  "{review.comment}"
+                </p>
+                <div className="flex justify-between items-end">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    — {review.name}{' '}
+                    {review.userId && (
+                      <span className="ml-2 text-blue-500">
+                        (Verified Customer)
+                      </span>
                     )}
-                 </div>
+                  </p>
+                  {!review.approved && (
+                    <button
+                      onClick={() => approveReview({ id: review._id })}
+                      className="bg-blue-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700"
+                    >
+                      Approve
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -281,32 +432,64 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
         {!isLoading && activeTab === 'gallery' && (
           <div className="space-y-12">
             <div className="flex justify-between items-center">
-               <h2 className="text-2xl font-black uppercase tracking-tighter">Manage Gallery</h2>
-               <input type="file" ref={galleryInputRef} onChange={async (e) => {
-                 if (e.target.files && e.target.files[0]) {
-                   const file = e.target.files[0]
-                   const postUrl = await generateUploadUrl()
-                   const result = await fetch(postUrl, {
-                     method: "POST",
-                     headers: { "Content-Type": file.type },
-                     body: file,
-                   })
-                   const { storageId } = await result.json()
-                   await addToGallery({ storageId })
-                   alert('Uploaded!')
-                 }
-               }} className="hidden" />
-               <button onClick={() => galleryInputRef.current?.click()} className="bg-blue-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-500 transition-all">Add New Photo</button>
+              <h2 className="text-2xl font-black uppercase tracking-tighter">
+                Manage Gallery
+              </h2>
+              <input
+                type="file"
+                ref={galleryInputRef}
+                onChange={async (e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0]
+                    const postUrl = await generateUploadUrl()
+                    const result = await fetch(postUrl, {
+                      method: 'POST',
+                      headers: { 'Content-Type': file.type },
+                      body: file,
+                    })
+                    const { storageId } = await result.json()
+                    await addToGallery({ storageId })
+                    alert('Uploaded!')
+                  }
+                }}
+                className="hidden"
+              />
+              <button
+                onClick={() => galleryInputRef.current?.click()}
+                className="bg-blue-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-500 transition-all"
+              >
+                Add New Photo
+              </button>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {galleryImages.map(img => (
-                <div key={img._id} className="aspect-square rounded-2xl overflow-hidden relative group border-2 border-slate-100 shadow-sm">
-                  {img.url && <img src={img.url} className="w-full h-full object-cover" />}
-                  <button 
-                    onClick={() => window.confirm('Permanent Delete?') && deleteGalleryImage({ id: img._id })} 
+              {galleryImages.map((img) => (
+                <div
+                  key={img._id}
+                  className="aspect-square rounded-2xl overflow-hidden relative group border-2 border-slate-100 shadow-sm"
+                >
+                  {img.url && (
+                    <img src={img.url} className="w-full h-full object-cover" />
+                  )}
+                  <button
+                    onClick={() =>
+                      window.confirm('Permanent Delete?') &&
+                      deleteGalleryImage({ id: img._id })
+                    }
                     className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                   >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
                   </button>
                 </div>
               ))}
@@ -314,26 +497,168 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
           </div>
         )}
 
+        {!isLoading && activeTab === 'social' && (
+          <div className="space-y-12">
+            <h2 className="text-2xl font-black uppercase tracking-tighter">
+              Social Media Links
+            </h2>
+            <p className="text-slate-500 text-sm">
+              Add links to your social media profiles. These will appear in the
+              footer of your website.
+            </p>
+            <form
+              onSubmit={handleSocialLinkSave}
+              className="max-w-2xl space-y-8"
+            >
+              {/* Facebook */}
+              <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black uppercase tracking-tight">
+                      Facebook
+                    </h3>
+                    <p className="text-[10px] text-slate-400 uppercase tracking-widest">
+                      Connect with customers on Facebook
+                    </p>
+                  </div>
+                </div>
+                <input
+                  type="url"
+                  placeholder="https://facebook.com/yourpage"
+                  value={facebookUrl}
+                  onChange={(e) => setFacebookUrl(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                />
+              </div>
+
+              {/* Instagram */}
+              <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 rounded-xl flex items-center justify-center">
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black uppercase tracking-tight">
+                      Instagram
+                    </h3>
+                    <p className="text-[10px] text-slate-400 uppercase tracking-widest">
+                      Share your work on Instagram
+                    </p>
+                  </div>
+                </div>
+                <input
+                  type="url"
+                  placeholder="https://instagram.com/yourprofile"
+                  value={instagramUrl}
+                  onChange={(e) => setInstagramUrl(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                />
+              </div>
+
+              {/* Twitter/X */}
+              <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-slate-950 rounded-xl flex items-center justify-center">
+                    <svg
+                      className="w-5 h-5 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black uppercase tracking-tight">
+                      X (Twitter)
+                    </h3>
+                    <p className="text-[10px] text-slate-400 uppercase tracking-widest">
+                      Connect on X (formerly Twitter)
+                    </p>
+                  </div>
+                </div>
+                <input
+                  type="url"
+                  placeholder="https://x.com/yourhandle"
+                  value={twitterUrl}
+                  onChange={(e) => setTwitterUrl(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSavingSocial}
+                className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-600/20 hover:bg-blue-500 transition-all disabled:bg-slate-300"
+              >
+                {isSavingSocial ? 'Saving...' : 'Save Social Media Links'}
+              </button>
+            </form>
+          </div>
+        )}
+
         {!isLoading && activeTab === 'settings' && (
           <div className="space-y-12">
-            <h2 className="text-2xl font-black uppercase tracking-tighter">Security Settings</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tighter">
+              Security Settings
+            </h2>
             <div className="max-w-md bg-white p-10 rounded-3xl border border-slate-200 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-blue-600"></div>
               <form onSubmit={handlePasswordChange} className="space-y-8">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Update Portal Password</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  Update Portal Password
+                </p>
                 <div>
-                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Current Password</label>
-                  <input type="password" required value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">
+                    Current Password
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                  />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">New Secret Password</label>
-                  <input type="password" required value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">
+                    New Secret Password
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                  />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">Confirm New Password</label>
-                  <input type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  <label className="text-[10px] font-black uppercase text-slate-500 mb-2 block tracking-widest">
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                  />
                 </div>
-                <button 
+                <button
                   disabled={isChanging}
                   className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-600/20 hover:bg-blue-500 transition-all disabled:bg-slate-300"
                 >
@@ -348,20 +673,46 @@ function AdminDashboard({ activeTab, setActiveTab, onLogout }: {
   )
 }
 
-function DemoDashboard({ setIsDemoMode }: { setIsDemoMode: (val: boolean) => void }) {
+function DemoDashboard({
+  setIsDemoMode,
+}: {
+  setIsDemoMode: (val: boolean) => void
+}) {
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-8 text-white text-center">
       <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-8 shadow-2xl shadow-blue-600/40 animate-pulse">
-         <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+        <svg
+          className="w-10 h-10"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M13 10V3L4 14h7v7l9-11h-7z"
+          />
+        </svg>
       </div>
-      <h1 className="text-4xl font-black uppercase tracking-tighter mb-4 italic text-blue-400">Owner Demo Mode</h1>
-      <p className="text-slate-500 max-w-sm mb-12 uppercase text-[10px] font-bold tracking-[0.3em] leading-relaxed">This is a sandbox simulation. No data is saved to your cloud account while in this mode.</p>
-      <button onClick={() => setIsDemoMode(false)} className="bg-white text-slate-950 px-12 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-400 hover:text-white transition-all shadow-2xl">Return to Real Portal</button>
+      <h1 className="text-4xl font-black uppercase tracking-tighter mb-4 italic text-blue-400">
+        Owner Demo Mode
+      </h1>
+      <p className="text-slate-500 max-w-sm mb-12 uppercase text-[10px] font-bold tracking-[0.3em] leading-relaxed">
+        This is a sandbox simulation. No data is saved to your cloud account
+        while in this mode.
+      </p>
+      <button
+        onClick={() => setIsDemoMode(false)}
+        className="bg-white text-slate-950 px-12 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-400 hover:text-white transition-all shadow-2xl"
+      >
+        Return to Real Portal
+      </button>
     </div>
   )
 }
 
-function LeadCard({ quote, updateQuote }: { quote: any, updateQuote: any }) {
+function LeadCard({ quote, updateQuote }: { quote: any; updateQuote: any }) {
   const [isEditing, setIsEditing] = useState(false)
   const [status, setStatus] = useState(quote.status || 'pending')
   const [date, setDate] = useState(quote.scheduledDate || '')
@@ -373,97 +724,185 @@ function LeadCard({ quote, updateQuote }: { quote: any, updateQuote: any }) {
   }
 
   return (
-    <div className={`bg-white p-8 md:p-12 rounded-[2.5rem] border ${status === 'booked' ? 'border-blue-600 shadow-2xl shadow-blue-100' : 'border-slate-100 shadow-sm'} transition-all`}>
+    <div
+      className={`bg-white p-8 md:p-12 rounded-[2.5rem] border ${status === 'booked' ? 'border-blue-600 shadow-2xl shadow-blue-100' : 'border-slate-100 shadow-sm'} transition-all`}
+    >
       <div className="flex flex-col lg:flex-row justify-between items-start gap-8">
         <div className="flex-grow space-y-6">
           <div className="flex flex-wrap items-center gap-4">
-            <h3 className="text-2xl font-black uppercase tracking-tighter text-slate-950">{quote.name}</h3>
-            <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
-              status === 'booked' ? 'bg-blue-600 text-white' : 
-              status === 'completed' ? 'bg-green-100 text-green-700' :
-              status === 'cancelled' ? 'bg-red-100 text-red-700' :
-              status === 'change_requested' ? 'bg-amber-100 text-amber-700' :
-              'bg-slate-100 text-slate-400'
-            }`}>
+            <h3 className="text-2xl font-black uppercase tracking-tighter text-slate-950">
+              {quote.name}
+            </h3>
+            <span
+              className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
+                status === 'booked'
+                  ? 'bg-blue-600 text-white'
+                  : status === 'completed'
+                    ? 'bg-green-100 text-green-700'
+                    : status === 'cancelled'
+                      ? 'bg-red-100 text-red-700'
+                      : status === 'change_requested'
+                        ? 'bg-amber-100 text-amber-700'
+                        : 'bg-slate-100 text-slate-400'
+              }`}
+            >
               {status.replace('_', ' ')}
             </span>
             {quote.customerAccepted && (
-              <span className="text-[9px] bg-green-500 text-white px-3 py-1 rounded-full font-black uppercase tracking-widest animate-pulse shadow-lg shadow-green-500/20">✓ Customer Approved</span>
+              <span className="text-[9px] bg-green-500 text-white px-3 py-1 rounded-full font-black uppercase tracking-widest animate-pulse shadow-lg shadow-green-500/20">
+                ✓ Customer Approved
+              </span>
+            )}
+            {quote.userId && (
+              <span className="text-[9px] bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-black uppercase tracking-widest">
+                Verified Customer
+              </span>
             )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100">
-                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Customer Contact</p>
-                <p className="text-sm font-bold text-blue-600">{quote.phone}</p>
-                <p className="text-xs font-medium text-slate-400">{quote.email}</p>
-             </div>
-             <div className="bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100">
-                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Job Location</p>
-                <p className="text-sm font-black uppercase text-slate-950 flex items-center gap-2">
-                   <span className="text-blue-600">📍</span>
-                   {quote.location || 'Not Specified'}
-                </p>
-             </div>
+            <div className="bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100">
+              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                Customer Contact
+              </p>
+              <p className="text-sm font-bold text-blue-600">{quote.phone}</p>
+              <p className="text-xs font-medium text-slate-400">
+                {quote.email}
+              </p>
+            </div>
+            <div className="bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100">
+              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                Job Location
+              </p>
+              <p className="text-sm font-black uppercase text-slate-950 flex items-center gap-2">
+                <span className="text-blue-600">📍</span>
+                {quote.location || 'Not Specified'}
+              </p>
+            </div>
           </div>
-          
+
           {quote.customerNotes && (
-             <div className="bg-amber-50 border border-amber-100 p-6 rounded-3xl">
-                <p className="text-[8px] font-black text-amber-600 uppercase tracking-widest mb-2 text-center">Message from Customer</p>
-                <p className="text-sm text-amber-950 italic font-medium leading-relaxed">"{quote.customerNotes}"</p>
-             </div>
+            <div className="bg-amber-50 border border-amber-100 p-6 rounded-3xl">
+              <p className="text-[8px] font-black text-amber-600 uppercase tracking-widest mb-2 text-center">
+                Message from Customer
+              </p>
+              <p className="text-sm text-amber-950 italic font-medium leading-relaxed">
+                "{quote.customerNotes}"
+              </p>
+            </div>
           )}
 
           <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-3">Job Description</p>
-             <p className="text-sm text-slate-600 font-medium leading-relaxed italic">"{quote.description}"</p>
-             <p className="text-[9px] text-slate-300 mt-4 uppercase font-bold tracking-widest italic">Received: {new Date(quote._creationTime).toLocaleDateString()}</p>
+            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-3">
+              Job Description
+            </p>
+            <p className="text-sm text-slate-600 font-medium leading-relaxed italic">
+              "{quote.description}"
+            </p>
+            <p className="text-[9px] text-slate-300 mt-4 uppercase font-bold tracking-widest italic">
+              Received: {new Date(quote._creationTime).toLocaleDateString()}
+            </p>
           </div>
         </div>
 
         <div className="w-full lg:w-80 space-y-6">
           <div className="bg-slate-950 text-white p-8 rounded-[2rem] shadow-2xl relative overflow-hidden group">
-             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform"></div>
-             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-6">Finalized Quote</h4>
-             
-             {isEditing ? (
-               <div className="space-y-4">
-                  <div className="space-y-1">
-                     <label className="text-[8px] uppercase font-black text-slate-500 tracking-widest">Pricing ($)</label>
-                     <input type="text" value={price} onChange={e => setPrice(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs outline-none focus:ring-1 focus:ring-blue-600" />
-                  </div>
-                  <div className="space-y-1">
-                     <label className="text-[8px] uppercase font-black text-slate-500 tracking-widest">Job Date</label>
-                     <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs outline-none focus:ring-1 focus:ring-blue-600" />
-                  </div>
-                  <div className="space-y-1">
-                     <label className="text-[8px] uppercase font-black text-slate-500 tracking-widest">Workflow Status</label>
-                     <select value={status} onChange={e => setStatus(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs outline-none focus:ring-1 focus:ring-blue-600">
-                        <option value="pending" className="text-black">Pending</option>
-                        <option value="booked" className="text-black">Booked</option>
-                        <option value="change_requested" className="text-black">Change Requested</option>
-                        <option value="completed" className="text-black">Completed</option>
-                        <option value="cancelled" className="text-black">Cancelled</option>
-                     </select>
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                     <button onClick={handleSave} className="flex-grow bg-blue-600 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">Save</button>
-                     <button onClick={() => setIsEditing(false)} className="bg-white/10 px-4 py-3 rounded-xl text-[10px] font-black">X</button>
-                  </div>
-               </div>
-             ) : (
-               <div className="space-y-6">
-                  <div className="flex justify-between items-end border-b border-white/5 pb-4">
-                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Amount</span>
-                     <span className="text-3xl font-black text-green-400 italic">${price || '---'}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Scheduled</span>
-                     <span className="text-xs font-black uppercase italic">{date || 'TBD'}</span>
-                  </div>
-                  <button onClick={() => setIsEditing(true)} className="w-full border-2 border-blue-600 text-blue-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all mt-4">Edit / Update Quote</button>
-               </div>
-             )}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform"></div>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-6">
+              Finalized Quote
+            </h4>
+
+            {isEditing ? (
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-[8px] uppercase font-black text-slate-500 tracking-widest">
+                    Pricing ($)
+                  </label>
+                  <input
+                    type="text"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs outline-none focus:ring-1 focus:ring-blue-600"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[8px] uppercase font-black text-slate-500 tracking-widest">
+                    Job Date
+                  </label>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs outline-none focus:ring-1 focus:ring-blue-600"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[8px] uppercase font-black text-slate-500 tracking-widest">
+                    Workflow Status
+                  </label>
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs outline-none focus:ring-1 focus:ring-blue-600"
+                  >
+                    <option value="pending" className="text-black">
+                      Pending
+                    </option>
+                    <option value="booked" className="text-black">
+                      Booked
+                    </option>
+                    <option value="change_requested" className="text-black">
+                      Change Requested
+                    </option>
+                    <option value="completed" className="text-black">
+                      Completed
+                    </option>
+                    <option value="cancelled" className="text-black">
+                      Cancelled
+                    </option>
+                  </select>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={handleSave}
+                    className="flex-grow bg-blue-600 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="bg-white/10 px-4 py-3 rounded-xl text-[10px] font-black"
+                  >
+                    X
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="flex justify-between items-end border-b border-white/5 pb-4">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    Amount
+                  </span>
+                  <span className="text-3xl font-black text-green-400 italic">
+                    ${price || '---'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    Scheduled
+                  </span>
+                  <span className="text-xs font-black uppercase italic">
+                    {date || 'TBD'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="w-full border-2 border-blue-600 text-blue-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all mt-4"
+                >
+                  Edit / Update Quote
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
