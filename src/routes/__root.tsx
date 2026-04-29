@@ -8,25 +8,8 @@ import {
 import * as React from 'react'
 import type { QueryClient } from '@tanstack/react-query'
 import appCss from '~/styles/app.css?url'
-
-function useSocialLinks() {
-  const [links, setLinks] = React.useState<{
-    jobber: string
-    facebook: string
-  }>({ jobber: '', facebook: '' })
-
-  React.useEffect(() => {
-    // Load social links from localStorage (set by admin dashboard)
-    const stored = localStorage.getItem('siouxland_social_links')
-    if (stored) {
-      try {
-        setLinks(JSON.parse(stored))
-      } catch {}
-    }
-  }, [])
-
-  return links
-}
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -104,7 +87,7 @@ function TruckLogo() {
 }
 
 function RootComponent() {
-  const socialLinks = useSocialLinks()
+  const socialLinks = useQuery(api.admin.getSocialLinks) || { jobber: '', facebook: '' }
 
   return (
     <RootDocument>

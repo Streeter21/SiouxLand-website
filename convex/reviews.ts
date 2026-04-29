@@ -50,7 +50,7 @@ export const approve = mutation({
   args: { id: v.id('reviews') },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ctx.db.patch('reviews', args.id, { approved: true })
+    await ctx.db.patch(args.id, { approved: true })
     return null
   },
 })
@@ -84,7 +84,7 @@ export const remove = mutation({
   args: { id: v.id('reviews') },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ctx.db.delete('reviews', args.id)
+    await ctx.db.delete(args.id)
     return null
   },
 })

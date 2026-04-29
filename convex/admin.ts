@@ -53,7 +53,7 @@ export const updateQuote = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const { id, ...updates } = args
-    await ctx.db.patch('quotes', id, updates)
+    await ctx.db.patch(id, updates)
     return null
   },
 })
@@ -106,7 +106,7 @@ export const resetPassword = mutation({
 
     // Clean up duplicates if they exist
     for (const s of settings) {
-      await ctx.db.delete('settings', s._id)
+      await ctx.db.delete(s._id)
     }
 
     await ctx.db.insert('settings', {
@@ -133,7 +133,7 @@ export const changePassword = mutation({
     }
 
     if (setting) {
-      await ctx.db.patch('settings', setting._id, { value: args.newPassword })
+      await ctx.db.patch(setting._id, { value: args.newPassword })
     } else {
       await ctx.db.insert('settings', {
         key: 'adminPassword',
@@ -179,9 +179,9 @@ export const updateSocialLinks = mutation({
       const existing = allSettings.find((s) => s.key === key)
       if (existing) {
         if (value === null || value === '') {
-          await ctx.db.delete('settings', existing._id)
+          await ctx.db.delete(existing._id)
         } else {
-          await ctx.db.patch('settings', existing._id, { value })
+          await ctx.db.patch(existing._id, { value })
         }
       } else if (value && value !== '') {
         await ctx.db.insert('settings', { key, value })

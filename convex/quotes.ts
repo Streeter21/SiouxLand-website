@@ -28,7 +28,7 @@ export const get = query({
   args: { id: v.id('quotes') },
   returns: v.any(),
   handler: async (ctx, args) => {
-    const quote = await ctx.db.get('quotes', args.id)
+    const quote = await ctx.db.get(args.id)
     if (!quote) return null
 
     // Get image URLs
@@ -60,21 +60,21 @@ export const customerAction = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const quote = await ctx.db.get('quotes', args.id)
+    const quote = await ctx.db.get(args.id)
     if (!quote) throw new Error('Quote not found')
 
     if (args.action === 'accept') {
-      await ctx.db.patch('quotes', args.id, {
+      await ctx.db.patch(args.id, {
         customerAccepted: true,
         status: 'booked',
       })
     } else if (args.action === 'cancel') {
-      await ctx.db.patch('quotes', args.id, {
+      await ctx.db.patch(args.id, {
         status: 'cancelled',
         customerNotes: args.message || 'Customer cancelled request',
       })
     } else {
-      await ctx.db.patch('quotes', args.id, {
+      await ctx.db.patch(args.id, {
         status: 'change_requested',
         customerNotes: args.message,
       })
