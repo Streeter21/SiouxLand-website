@@ -12,6 +12,7 @@ import type * as admin from "../admin.js";
 import type * as gallery from "../gallery.js";
 import type * as quotes from "../quotes.js";
 import type * as reviews from "../reviews.js";
+import type * as settings from "../settings.js";
 
 import type {
   ApiFromModules,
@@ -24,6 +25,7 @@ declare const fullApi: ApiFromModules<{
   gallery: typeof gallery;
   quotes: typeof quotes;
   reviews: typeof reviews;
+  settings: typeof settings;
 }>;
 
 /**
