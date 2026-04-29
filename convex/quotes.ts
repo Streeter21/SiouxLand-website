@@ -12,15 +12,22 @@ export const submit = mutation({
     smallSpaces: v.boolean(),
     other: v.boolean(),
     imageIds: v.array(v.id('_storage')),
-    location: v.string(),
+    location: v.optional(v.string()),
   },
-  returns: v.id('quotes'),
+  returns: v.any(),
   handler: async (ctx, args) => {
-    return await ctx.db.insert('quotes', {
-      ...args,
-      status: 'pending',
-      customerAccepted: false,
-    })
+    try {
+      const id = await ctx.db.insert('quotes', {
+        ...args,
+        status: 'pending',
+        customerAccepted: false,
+        location: args.location || 'Unknown',
+      })
+      return id
+    } catch (error) {
+      console.error('Error submitting quote:', error)
+      throw new Error('Database insertion failed. Please try again.')
+    }
   },
 })
 

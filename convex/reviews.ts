@@ -37,12 +37,18 @@ export const submit = mutation({
     rating: v.number(),
     comment: v.string(),
   },
-  returns: v.id('reviews'),
+  returns: v.any(),
   handler: async (ctx, args) => {
-    return await ctx.db.insert('reviews', {
-      ...args,
-      approved: false, // Default to false so owner can review
-    })
+    try {
+      const id = await ctx.db.insert('reviews', {
+        ...args,
+        approved: false, // Default to false so owner can review
+      })
+      return id
+    } catch (error) {
+      console.error('Error submitting review:', error)
+      throw new Error('Could not save your review. Please try again.')
+    }
   },
 })
 

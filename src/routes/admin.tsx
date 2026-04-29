@@ -109,7 +109,7 @@ function AdminPage() {
             Owner Access
           </h1>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] mb-12 relative">
-            SiouxLand Clean Out Crew
+            SiouxLand Clean Out Crew | v1.2.5-safe
           </p>
 
           <div className="space-y-8">
@@ -280,7 +280,7 @@ function AdminDashboard({
               Business Dashboard
             </h1>
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-              SiouxLand COC Admin Portal
+              SiouxLand COC Admin Portal v1.2.5-safe
             </p>
           </div>
         </div>
