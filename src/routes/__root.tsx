@@ -280,7 +280,7 @@ function RootComponent() {
               reserved.
             </p>
             <p className="text-[8px] text-slate-800 uppercase tracking-widest">
-              v1.2.0-stable
+              v1.2.5-safe
             </p>
           </div>
         </footer>
