@@ -71,21 +71,18 @@ export const verifyPassword = mutation({
   returns: v.boolean(),
   handler: async (ctx, args) => {
     try {
-      // Use .first() instead of .unique() to avoid crashes if duplicates exist
       const setting = await ctx.db
         .query('settings')
         .withIndex('by_key', (q) => q.eq('key', 'adminPassword'))
         .first()
 
       if (!setting) {
-        // Fallback to default if no setting found
         return args.password === 'siouxland123'
       }
 
       return args.password === setting.value
     } catch (error) {
       console.error('Critical: Password verification failed', error)
-      // In case of any DB error, we allow the default password as a safety net
       return args.password === 'siouxland123'
     }
   },
@@ -104,7 +101,6 @@ export const resetPassword = mutation({
       .withIndex('by_key', (q) => q.eq('key', 'adminPassword'))
       .collect()
 
-    // Clean up duplicates if they exist
     for (const s of settings) {
       await ctx.db.delete(s._id)
     }
@@ -152,16 +148,18 @@ export const getSocialLinks = query({
     facebook: v.string(),
   }),
   handler: async (ctx) => {
-    const settings = await ctx.db.query('settings').collect()
-    const result: Record<string, string> = {}
-    for (const s of settings) {
-      if (s.key === 'social_jobber' || s.key === 'social_facebook') {
-        result[s.key.replace('social_', '')] = s.value
-      }
-    }
+    const jobberDoc = await ctx.db
+      .query('settings')
+      .withIndex('by_key', (q) => q.eq('key', 'social_jobber'))
+      .first()
+    const facebookDoc = await ctx.db
+      .query('settings')
+      .withIndex('by_key', (q) => q.eq('key', 'social_facebook'))
+      .first()
+
     return {
-      jobber: result['jobber'] ?? '',
-      facebook: result['facebook'] ?? '',
+      jobber: jobberDoc?.value ?? '',
+      facebook: facebookDoc?.value ?? '',
     }
   },
 })
@@ -173,23 +171,25 @@ export const updateSocialLinks = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const allSettings = await ctx.db.query('settings').collect()
+    const updateSetting = async (key: string, value: string | undefined | null) => {
+      const existing = await ctx.db
+        .query('settings')
+        .withIndex('by_key', (q) => q.eq('key', key))
+        .first()
 
-    const updateSetting = async (key: string, value: string | null) => {
-      const existing = allSettings.find((s) => s.key === key)
       if (existing) {
-        if (value === null || value === '') {
+        if (value == null || value === '') {
           await ctx.db.delete(existing._id)
         } else {
           await ctx.db.patch(existing._id, { value })
         }
-      } else if (value && value !== '') {
+      } else if (value != null && value !== '') {
         await ctx.db.insert('settings', { key, value })
       }
     }
 
-    await updateSetting('social_jobber', args.jobber ?? null)
-    await updateSetting('social_facebook', args.facebook ?? null)
+    await updateSetting('social_jobber', args.jobber)
+    await updateSetting('social_facebook', args.facebook)
 
     return null
   },
