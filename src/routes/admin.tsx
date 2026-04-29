@@ -200,9 +200,18 @@ function AdminDashboard({
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isChanging, setIsChanging] = useState(false)
-  const [jobberUrl, setJobberUrl] = useState(socialLinks.jobber)
-  const [facebookUrl, setFacebookUrl] = useState(socialLinks.facebook)
+  
+  const [jobberUrl, setJobberUrl] = useState('')
+  const [facebookUrl, setFacebookUrl] = useState('')
   const [isSavingLinks, setIsSavingLinks] = useState(false)
+
+  // Sync social links from database
+  useEffect(() => {
+    if (socialLinksRaw) {
+      setJobberUrl(socialLinksRaw.jobber || '')
+      setFacebookUrl(socialLinksRaw.facebook || '')
+    }
+  }, [socialLinksRaw])
 
   const changePwd = useMutation(api.admin.changePassword)
   const updateQuote = useMutation(api.admin.updateQuote)
@@ -518,14 +527,6 @@ function AdminDashboard({
                       jobber: jobberUrl || undefined,
                       facebook: facebookUrl || undefined,
                     })
-                    // Also save to localStorage for footer display
-                    localStorage.setItem(
-                      'siouxland_social_links',
-                      JSON.stringify({
-                        jobber: jobberUrl || '',
-                        facebook: facebookUrl || '',
-                      }),
-                    )
                     alert('Social links updated!')
                   } catch (err) {
                     alert('Error updating links')
@@ -565,7 +566,7 @@ function AdminDashboard({
                 <button
                   type="submit"
                   disabled={isSavingLinks}
-                  className="w-full bg-green-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-green-600/20 hover:bg-green-500 transition-all disabled:bg-slate-300"
+                  className="w-full bg-green-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-600/20 hover:bg-green-500 transition-all disabled:bg-slate-300"
                 >
                   {isSavingLinks ? 'Saving...' : 'Save Social Links'}
                 </button>
