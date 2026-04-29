@@ -71,10 +71,9 @@ export const verifyPassword = mutation({
   returns: v.boolean(),
   handler: async (ctx, args) => {
     try {
-      const setting = await ctx.db
-        .query('settings')
-        .withIndex('by_key', (q) => q.eq('key', 'adminPassword'))
-        .first()
+      // Use collect to be safe against missing indexes during deployment
+      const settings = await ctx.db.query('settings').collect()
+      const setting = settings.find((s) => s.key === 'adminPassword')
 
       if (!setting) {
         return args.password === 'siouxland123'
@@ -83,6 +82,7 @@ export const verifyPassword = mutation({
       return args.password === setting.value
     } catch (error) {
       console.error('Critical: Password verification failed', error)
+      // Safety fallback to default password
       return args.password === 'siouxland123'
     }
   },
@@ -96,12 +96,10 @@ export const resetPassword = mutation({
       return 'Invalid recovery secret'
     }
 
-    const settings = await ctx.db
-      .query('settings')
-      .withIndex('by_key', (q) => q.eq('key', 'adminPassword'))
-      .collect()
+    const settings = await ctx.db.query('settings').collect()
+    const passwordSettings = settings.filter((s) => s.key === 'adminPassword')
 
-    for (const s of settings) {
+    for (const s of passwordSettings) {
       await ctx.db.delete(s._id)
     }
 
@@ -117,10 +115,8 @@ export const changePassword = mutation({
   args: { oldPassword: v.string(), newPassword: v.string() },
   returns: v.object({ success: v.boolean(), message: v.string() }),
   handler: async (ctx, args) => {
-    const setting = await ctx.db
-      .query('settings')
-      .withIndex('by_key', (q) => q.eq('key', 'adminPassword'))
-      .first()
+    const settings = await ctx.db.query('settings').collect()
+    const setting = settings.find((s) => s.key === 'adminPassword')
 
     const currentPassword = setting ? setting.value : 'siouxland123'
 
