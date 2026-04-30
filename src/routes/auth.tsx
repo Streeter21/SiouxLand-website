@@ -18,15 +18,28 @@ function AuthPage() {
     setError(null);
     setLoading(true);
     const formData = new FormData(event.currentTarget);
+    
+    if (step === "signUp") {
+      const password = formData.get("password") as string;
+      const confirmPassword = formData.get("confirmPassword") as string;
+      if (password !== confirmPassword) {
+        setError("Passwords do not match.");
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
       await signIn("password", formData);
       navigate({ to: "/" });
     } catch (e: any) {
       const errorMsg = e.message || "";
-      if (errorMsg.includes("already exists")) {
+      if (errorMsg.includes("already exists") || errorMsg.includes("409")) {
         setError("An account with this email already exists.");
       } else if (errorMsg.includes("Invalid password")) {
         setError("Password must be at least 8 characters.");
+      } else if (errorMsg.includes("Invalid credentials") || errorMsg.includes("401")) {
+        setError(step === "signIn" ? "Invalid email or password." : "Error creating account. Please try again.");
       } else {
         setError("Authentication failed. Please check your details and try again.");
       }
@@ -42,9 +55,20 @@ function AuthPage() {
         <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900">
           SiouxLand Clean Out
         </h1>
-        <h2 className="mt-2 text-sm font-bold uppercase tracking-widest text-slate-500">
-          {step === "signIn" ? "Customer Login" : "Create Account"}
-        </h2>
+        <div className="mt-6 flex justify-center p-1 bg-slate-200 rounded-xl max-w-[240px] mx-auto">
+          <button
+            onClick={() => setStep("signIn")}
+            className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${step === "signIn" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+          >
+            Login
+          </button>
+          <button
+            onClick={() => setStep("signUp")}
+            className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${step === "signUp" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+          >
+            Sign Up
+          </button>
+        </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -79,7 +103,7 @@ function AuthPage() {
 
             <div>
               <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
-                Password
+                {step === "signUp" ? "Create Password" : "Password"}
               </label>
               <input
                 name="password"
@@ -89,6 +113,21 @@ function AuthPage() {
                 placeholder="••••••••"
               />
             </div>
+
+            {step === "signUp" && (
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
+                  Confirm Password
+                </label>
+                <input
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  className="block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
+                  placeholder="••••••••"
+                />
+              </div>
+            )}
 
             <input name="flow" value={step} type="hidden" />
 

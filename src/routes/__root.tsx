@@ -60,8 +60,8 @@ export const Route = createRootRouteWithContext<{
     links: [
       { rel: 'stylesheet', href: appCss },
       { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' },
-      { rel: 'alternate icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'apple-touch-icon', href: '/logo.svg' },
+      { rel: 'shortcut icon', href: '/logo.svg' },
     ],
   }),
   component: RootComponent,
@@ -305,7 +305,7 @@ function RootComponent() {
               reserved.
             </p>
             <p className="text-[8px] text-slate-800 uppercase tracking-widest">
-              v1.3.0-FIX-AUTH-LOGO
+              v1.3.1-AUTH-REPAIR
             </p>
           </div>
         </footer>
