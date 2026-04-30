@@ -73,26 +73,27 @@ export const getImageUrl = query({
 
 export const verifyPassword = mutation({
   args: { password: v.string() },
-  returns: v.any(),
+  returns: v.boolean(),
   handler: async (ctx, args) => {
+    // VERSION 1.2.6 SAFE
+    if (args.password === 'siouxland123') return true;
+    
     try {
-      // Direct comparison first for speed and to avoid any DB dependency if it's the default
-      if (args.password === 'siouxland123') return true;
-
-      // Use a safe query to find the password in the database
       const settings = await ctx.db.query('settings').collect();
       const setting = settings.find(s => s.key === 'adminPassword');
-
-      if (setting && args.password === setting.value) {
-        return true;
-      }
-
-      return args.password === 'siouxland123';
+      return setting?.value === args.password;
     } catch (e) {
-      // If the table 'settings' doesn't exist yet, we only allow the default password
       return args.password === 'siouxland123';
     }
   },
+})
+
+export const getBackendStatus = query({
+  args: {},
+  returns: v.string(),
+  handler: async () => {
+    return "v1.2.6-safe-backend-active";
+  }
 })
 
 export const resetPassword = mutation({

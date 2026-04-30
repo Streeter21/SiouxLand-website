@@ -14,7 +14,7 @@ export const submit = mutation({
     imageIds: v.array(v.id('_storage')),
     location: v.optional(v.string()),
   },
-  returns: v.any(),
+  returns: v.string(),
   handler: async (ctx, args) => {
     try {
       const id = await ctx.db.insert('quotes', {
@@ -23,7 +23,7 @@ export const submit = mutation({
         customerAccepted: false,
         location: args.location || 'Unknown',
       })
-      return id
+      return id.toString()
     } catch (error) {
       console.error('Error submitting quote:', error)
       throw new Error('Database insertion failed. Please try again.')

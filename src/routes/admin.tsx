@@ -23,6 +23,7 @@ function AdminPage() {
 
   const verify = useMutation(api.admin.verifyPassword)
   const resetPwd = useMutation(api.admin.resetPassword)
+  const { data: backendStatus } = useQuery(convexQuery(api.admin.getBackendStatus, {}))
 
   useEffect(() => {
     const savedLogin = localStorage.getItem('siouxland_admin_logged_in')
@@ -90,7 +91,7 @@ function AdminPage() {
           <div className="flex items-center gap-3 mb-4">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">
-              Database Connection Active
+              Database Connection: {backendStatus ? 'v1.2.6 ACTIVE' : 'Stale/Old Backend'}
             </p>
           </div>
           <p className="text-[8px] font-mono text-slate-500 break-all leading-relaxed opacity-50">
