@@ -95,7 +95,7 @@ function RootComponent() {
 
   return (
     <RootDocument>
-      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+      <div className="min-h-screen bg-white text-slate-900 font-sans">
         <nav className="bg-slate-950 text-white py-4 px-4 md:px-8 sticky top-0 z-50 shadow-xl">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <Link to="/" className="flex items-center space-x-3 group">

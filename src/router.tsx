@@ -31,14 +31,14 @@ export function getRouter() {
       scrollRestoration: true,
       defaultPreloadStaleTime: 0,
       defaultErrorComponent: ({ error }) => (
-        <div className="p-8 text-center bg-slate-50 min-h-screen flex flex-col items-center justify-center">
+        <div className="p-8 text-center bg-white min-h-screen flex flex-col items-center justify-center">
           <h2 className="text-2xl font-black uppercase tracking-tighter mb-4 text-slate-900">Something went wrong</h2>
           <p className="text-slate-500 mb-8 max-w-md">{error.message || "We're having trouble connecting to the database."}</p>
           <a href="/" className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs">Return Home</a>
         </div>
       ),
       defaultNotFoundComponent: () => (
-        <div className="p-8 text-center bg-slate-50 min-h-screen flex flex-col items-center justify-center">
+        <div className="p-8 text-center bg-white min-h-screen flex flex-col items-center justify-center">
           <h2 className="text-2xl font-black uppercase tracking-tighter mb-4">Page Not Found</h2>
           <a href="/" className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs">Return Home</a>
         </div>

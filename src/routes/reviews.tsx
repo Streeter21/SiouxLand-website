@@ -153,7 +153,7 @@ function ReviewList() {
 
   if (isError || !reviews || reviews.length === 0) {
     return (
-      <div className="bg-slate-50 border border-slate-100 p-12 text-center rounded-2xl">
+      <div className="bg-white border border-slate-100 p-12 text-center rounded-2xl">
         <p className="text-slate-400 italic">No reviews yet. Be the first to tell us how we did!</p>
       </div>
     )

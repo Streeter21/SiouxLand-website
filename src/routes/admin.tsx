@@ -126,7 +126,7 @@ function AdminPage() {
                 disabled={isVerifying}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full bg-slate-50 border-2 ${lastError ? 'border-red-500' : 'border-slate-100'} rounded-2xl px-6 py-5 focus:border-blue-600 focus:ring-0 outline-none transition-all text-lg font-bold text-slate-900 disabled:opacity-50 shadow-inner`}
+                className={`w-full bg-white border-2 ${lastError ? 'border-red-500' : 'border-slate-100'} rounded-2xl px-6 py-5 focus:border-blue-600 focus:ring-0 outline-none transition-all text-lg font-bold text-slate-900 disabled:opacity-50 shadow-inner`}
               />
               {lastError && (
                 <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-3 animate-bounce">
@@ -259,7 +259,7 @@ function AdminDashboard({
 
   if (hasError) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-8">
         <h2 className="text-xl font-bold text-red-600 mb-4">Dashboard Error</h2>
         <p className="text-slate-600 mb-8">We couldn't load some of your business data.</p>
         <div className="bg-red-50 p-4 rounded-xl border border-red-100 mb-8 text-xs font-mono max-w-lg overflow-auto">
@@ -273,7 +273,7 @@ function AdminDashboard({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900">
       {/* Top Header */}
       <div className="bg-slate-950 text-white p-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6 border-b-4 border-blue-600">
         <div className="flex items-center gap-4">
@@ -522,7 +522,7 @@ function AdminDashboard({
                     required
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -534,7 +534,7 @@ function AdminDashboard({
                     required
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -546,7 +546,7 @@ function AdminDashboard({
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-blue-600 outline-none transition-all"
                   />
                 </div>
                 <button
@@ -595,7 +595,7 @@ function AdminDashboard({
                     value={jobberUrl}
                     onChange={(e) => setJobberUrl(e.target.value)}
                     placeholder="https://app.jobber.com/..."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -607,7 +607,7 @@ function AdminDashboard({
                     value={facebookUrl}
                     onChange={(e) => setFacebookUrl(e.target.value)}
                     placeholder="https://www.facebook.com/..."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -619,7 +619,7 @@ function AdminDashboard({
                     value={instagramUrl}
                     onChange={(e) => setInstagramUrl(e.target.value)}
                     placeholder="https://www.instagram.com/..."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -631,7 +631,7 @@ function AdminDashboard({
                     value={tiktokUrl}
                     onChange={(e) => setTiktokUrl(e.target.value)}
                     placeholder="https://www.tiktok.com/@..."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-4 text-sm focus:ring-2 focus:ring-green-600 outline-none transition-all"
                   />
                 </div>
                 <button
@@ -749,7 +749,7 @@ function LeadCard({ quote, updateQuote }: { quote: any; updateQuote: any }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100">
+            <div className="bg-white px-6 py-4 rounded-2xl border border-slate-100">
               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
                 Customer Contact
               </p>
@@ -758,7 +758,7 @@ function LeadCard({ quote, updateQuote }: { quote: any; updateQuote: any }) {
                 {quote.email}
               </p>
             </div>
-            <div className="bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100">
+            <div className="bg-white px-6 py-4 rounded-2xl border border-slate-100">
               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">
                 Job Location
               </p>
@@ -780,7 +780,7 @@ function LeadCard({ quote, updateQuote }: { quote: any; updateQuote: any }) {
             </div>
           )}
 
-          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+          <div className="bg-white p-6 rounded-3xl border border-slate-100">
             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-3">
               Job Description
             </p>

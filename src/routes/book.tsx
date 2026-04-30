@@ -162,7 +162,7 @@ function BookPage() {
                       type="text" 
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                      className="w-full bg-white border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
                       placeholder="Enter your name"
                     />
                   </div>
@@ -173,7 +173,7 @@ function BookPage() {
                       type="tel" 
                       value={formData.phone}
                       onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                      className="w-full bg-white border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
                       placeholder="(712) 000-0000"
                     />
                   </div>
@@ -187,7 +187,7 @@ function BookPage() {
                       type="email" 
                       value={formData.email}
                       onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                      className="w-full bg-white border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
                       placeholder="you@example.com"
                     />
                   </div>
@@ -198,7 +198,7 @@ function BookPage() {
                       type="text" 
                       value={formData.location}
                       onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                      className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                      className="w-full bg-white border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
                       placeholder="e.g. Sioux City, IA"
                     />
                   </div>
@@ -213,7 +213,7 @@ function BookPage() {
                       { id: 'smallSpaces', label: 'Small Spaces' },
                       { id: 'other', label: 'Other Special Case' }
                     ].map(item => (
-                      <label key={item.id} className="flex items-center p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors group">
+                      <label key={item.id} className="flex items-center p-4 bg-white rounded-xl cursor-pointer hover:bg-slate-100 transition-colors group">
                         <input 
                           type="checkbox" 
                           checked={(formData as any)[item.id]}
@@ -232,7 +232,7 @@ function BookPage() {
                     required
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full bg-slate-50 border-none rounded-xl px-6 py-4 min-h-[160px] focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                    className="w-full bg-white border-none rounded-xl px-6 py-4 min-h-[160px] focus:ring-2 focus:ring-blue-600 outline-none transition-all"
                     placeholder="Describe the items or the space you need cleared..."
                   />
                 </div>
@@ -241,7 +241,7 @@ function BookPage() {
                   <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Add Photos (Recommended)</label>
                   <div 
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center hover:border-blue-400 transition-all cursor-pointer bg-slate-50/50"
+                    className="border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center hover:border-blue-400 transition-all cursor-pointer bg-white/50"
                   >
                     <input 
                       type="file" 

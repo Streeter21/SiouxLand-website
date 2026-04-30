@@ -65,7 +65,7 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900">
           SiouxLand Clean Out
@@ -98,7 +98,7 @@ function AuthPage() {
                   name="name"
                   type="text"
                   required
-                  className="block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
+                  className="block w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
                   placeholder="John Doe"
                 />
               </div>
@@ -111,7 +111,7 @@ function AuthPage() {
                 name="email"
                 type="email"
                 required
-                className="block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
+                className="block w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
                 placeholder="you@example.com"
               />
             </div>
@@ -124,7 +124,7 @@ function AuthPage() {
                 name="password"
                 type="password"
                 required
-                className="block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
+                className="block w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
                 placeholder="••••••••"
               />
             </div>
@@ -138,7 +138,7 @@ function AuthPage() {
                   name="confirmPassword"
                   type="password"
                   required
-                  className="block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
+                  className="block w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
                   placeholder="••••••••"
                 />
               </div>

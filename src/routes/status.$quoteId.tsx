@@ -21,7 +21,7 @@ function StatusPage() {
 
   if (!quote) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="bg-white p-12 rounded-2xl shadow-xl text-center max-w-md">
           <h1 className="text-2xl font-black uppercase mb-4">Quote Not Found</h1>
           <p className="text-slate-500 mb-8 text-sm">We couldn't find a quote with that ID. Please check the link or contact us.</p>
@@ -48,7 +48,7 @@ function StatusPage() {
   const isCancelled = quote.status === 'cancelled'
 
   return (
-    <div className="bg-slate-50 min-h-screen pb-24">
+    <div className="bg-white min-h-screen pb-24">
       <div className="bg-slate-950 text-white py-16 px-4 text-center">
         <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase mb-2">Quote Status</h1>
         <p className="text-blue-400 text-[10px] font-black uppercase tracking-[0.3em]">SiouxLand Clean Out Crew</p>
@@ -82,11 +82,11 @@ function StatusPage() {
                </div>
             ) : (quote.price || quote.scheduledDate) ? (
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 text-center">
+                <div className="bg-white p-8 rounded-2xl border border-slate-100 text-center">
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Proposed Price</p>
                    <p className="text-4xl font-black text-slate-950">${quote.price || 'TBD'}</p>
                 </div>
-                <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 text-center">
+                <div className="bg-white p-8 rounded-2xl border border-slate-100 text-center">
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Proposed Date</p>
                    <p className="text-2xl font-black text-slate-950">{quote.scheduledDate ? new Date(quote.scheduledDate).toLocaleDateString() : 'TBD'}</p>
                    {quote.scheduledTime && <p className="text-sm font-bold text-blue-600 mt-1">{quote.scheduledTime}</p>}
@@ -142,7 +142,7 @@ function StatusPage() {
                 </div>
 
                 {showChangeForm && (
-                  <div className="p-8 bg-slate-50 rounded-2xl border border-slate-200 animate-in fade-in slide-in-from-top-4">
+                  <div className="p-8 bg-white rounded-2xl border border-slate-200 animate-in fade-in slide-in-from-top-4">
                     <label className="text-[10px] font-black uppercase text-slate-400 mb-4 block">Details for your request:</label>
                     <textarea 
                       value={requestMessage}
@@ -202,7 +202,7 @@ function StatusPage() {
                  </div>
                  <div className="space-y-2">
                     <span className="text-xs font-bold text-slate-500">Description</span>
-                    <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-xl italic">
+                    <p className="text-sm text-slate-700 leading-relaxed bg-white p-4 rounded-xl italic">
                       "{quote.description}"
                     </p>
                  </div>
