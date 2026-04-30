@@ -286,7 +286,7 @@ function RootComponent() {
               reserved.
             </p>
             <p className="text-[8px] text-slate-800 uppercase tracking-widest">
-              v1.2.7-auth
+              v1.2.8-DEPLOYED-ACCOUNTS
             </p>
           </div>
         </footer>

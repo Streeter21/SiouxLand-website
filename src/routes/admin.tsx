@@ -111,7 +111,7 @@ function AdminPage() {
             Owner Access
           </h1>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] mb-12 relative">
-            SiouxLand Clean Out Crew | v1.2.7-auth
+            SiouxLand Clean Out Crew | v1.2.8-DEPLOYED-ACCOUNTS
           </p>
 
           <div className="space-y-8">
