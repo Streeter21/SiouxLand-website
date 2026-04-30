@@ -225,7 +225,7 @@ function StatusPage() {
         </div>
         
         <div className="mt-12 text-center">
-          <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Have questions? Text us at 712-281-5225</p>
+          <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Accepted Payment Methods: Venmo • Check • Cash. Have questions? Text us at 712-281-5225</p>
         </div>
       </div>
     </div>

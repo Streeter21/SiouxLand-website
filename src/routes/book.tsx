@@ -271,6 +271,14 @@ function BookPage() {
                 >
                   {isSubmitting ? "Sending Request..." : "Request Quote"}
                 </button>
+                <div className="mt-8 pt-8 border-t border-slate-50 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Accepted Payment Methods</p>
+                  <div className="flex justify-center gap-6">
+                    <span className="text-xs font-bold text-slate-600">Venmo</span>
+                    <span className="text-xs font-bold text-slate-600">Check</span>
+                    <span className="text-xs font-bold text-slate-600">Cash</span>
+                  </div>
+                </div>
               </form>
             )}
           </div>

@@ -21,9 +21,16 @@ function AuthPage() {
     try {
       await signIn("password", formData);
       navigate({ to: "/" });
-    } catch (e) {
-      setError("Invalid email or password. Please try again.");
-      console.error(e);
+    } catch (e: any) {
+      const errorMsg = e.message || "";
+      if (errorMsg.includes("already exists")) {
+        setError("An account with this email already exists.");
+      } else if (errorMsg.includes("Invalid password")) {
+        setError("Password must be at least 8 characters.");
+      } else {
+        setError("Authentication failed. Please check your details and try again.");
+      }
+      console.error("Auth Error:", e);
     } finally {
       setLoading(false);
     }

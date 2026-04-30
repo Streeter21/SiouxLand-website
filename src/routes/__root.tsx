@@ -203,81 +203,100 @@ function RootComponent() {
             </div>
             <div>
               <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-6">
-                Contact
+                Payment Methods
               </h4>
               <ul className="space-y-4 text-sm">
-                <li>
-                  <a
-                    href="tel:7122815225"
-                    className="hover:text-white transition-colors"
-                  >
-                    712-281-5225
-                  </a>
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <span>Venmo</span>
                 </li>
-                <li>
-                  <a
-                    href="mailto:siouxlandcoc@gmail.com"
-                    className="hover:text-white transition-colors"
-                  >
-                    siouxlandcoc@gmail.com
-                  </a>
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <span>Check</span>
                 </li>
-                {(socialLinks.jobber || socialLinks.facebook || socialLinks.instagram || socialLinks.tiktok) && (
-                  <li className="pt-2 flex flex-wrap gap-3">
-                    {socialLinks.jobber && socialLinks.jobber !== '' && (
-                      <a
-                        href={socialLinks.jobber}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-green-600/20 hover:bg-green-600/40 text-green-400 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
-                      >
-                        Jobber
-                      </a>
-                    )}
-                    {socialLinks.facebook && socialLinks.facebook !== '' && (
-                      <a
-                        href={socialLinks.facebook}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
-                      >
-                        Facebook
-                      </a>
-                    )}
-                    {socialLinks.instagram && socialLinks.instagram !== '' && (
-                      <a
-                        href={socialLinks.instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-pink-600/20 hover:bg-pink-600/40 text-pink-400 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
-                      >
-                        Instagram
-                      </a>
-                    )}
-                    {socialLinks.tiktok && socialLinks.tiktok !== '' && (
-                      <a
-                        href={socialLinks.tiktok}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-slate-600/20 hover:bg-slate-600/40 text-white px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
-                      >
-                        TikTok
-                      </a>
-                    )}
-                  </li>
-                )}
-                <li className="pt-6">
-                  <Link
-                    to="/admin"
-                    className="inline-block bg-slate-900 border border-slate-800 text-slate-400 hover:text-blue-400 hover:border-blue-900 px-4 py-2 rounded text-[9px] uppercase tracking-[0.2em] transition-all"
-                  >
-                    Owner Login
-                  </Link>
-                </li>
-                <li className="text-xs italic mt-2 text-slate-500 font-medium tracking-wide uppercase">
-                  New Local Business
+                <li className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <span>Cash</span>
                 </li>
               </ul>
+              <div className="mt-8 pt-8 border-t border-slate-900">
+                <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-6">
+                  Contact
+                </h4>
+                <ul className="space-y-4 text-sm">
+                  <li>
+                    <a
+                      href="tel:7122815225"
+                      className="hover:text-white transition-colors"
+                    >
+                      712-281-5225
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="mailto:siouxlandcoc@gmail.com"
+                      className="hover:text-white transition-colors"
+                    >
+                      siouxlandcoc@gmail.com
+                    </a>
+                  </li>
+                  {(socialLinks.jobber || socialLinks.facebook || socialLinks.instagram || socialLinks.tiktok) && (
+                    <li className="pt-2 flex flex-wrap gap-3">
+                      {socialLinks.jobber && socialLinks.jobber !== '' && (
+                        <a
+                          href={socialLinks.jobber}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-green-600/20 hover:bg-green-600/40 text-green-400 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
+                        >
+                          Jobber
+                        </a>
+                      )}
+                      {socialLinks.facebook && socialLinks.facebook !== '' && (
+                        <a
+                          href={socialLinks.facebook}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
+                        >
+                          Facebook
+                        </a>
+                      )}
+                      {socialLinks.instagram && socialLinks.instagram !== '' && (
+                        <a
+                          href={socialLinks.instagram}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-pink-600/20 hover:bg-pink-600/40 text-pink-400 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
+                        >
+                          Instagram
+                        </a>
+                      )}
+                      {socialLinks.tiktok && socialLinks.tiktok !== '' && (
+                        <a
+                          href={socialLinks.tiktok}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-slate-600/20 hover:bg-slate-600/40 text-white px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors"
+                        >
+                          TikTok
+                        </a>
+                      )}
+                    </li>
+                  )}
+                  <li className="pt-6">
+                    <Link
+                      to="/admin"
+                      className="inline-block bg-slate-900 border border-slate-800 text-slate-400 hover:text-blue-400 hover:border-blue-900 px-4 py-2 rounded text-[9px] uppercase tracking-[0.2em] transition-all"
+                    >
+                      Owner Login
+                    </Link>
+                  </li>
+                  <li className="text-xs italic mt-2 text-slate-500 font-medium tracking-wide uppercase">
+                    New Local Business
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
           <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-slate-900 text-center">
