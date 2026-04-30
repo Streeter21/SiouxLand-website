@@ -18,9 +18,11 @@ function AuthPage() {
     setError(null);
     setLoading(true);
     const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const name = formData.get("name") as string;
     
     if (step === "signUp") {
-      const password = formData.get("password") as string;
       const confirmPassword = formData.get("confirmPassword") as string;
       if (password !== confirmPassword) {
         setError("Passwords do not match.");
@@ -30,20 +32,33 @@ function AuthPage() {
     }
 
     try {
-      await signIn("password", formData);
+      if (step === "signUp") {
+        await signIn("password", {
+          email,
+          password,
+          name,
+          flow: "signUp",
+        });
+      } else {
+        await signIn("password", {
+          email,
+          password,
+          flow: "signIn",
+        });
+      }
       navigate({ to: "/" });
     } catch (e: any) {
-      const errorMsg = e.message || "";
-      if (errorMsg.includes("already exists") || errorMsg.includes("409")) {
-        setError("An account with this email already exists.");
-      } else if (errorMsg.includes("Invalid password")) {
+      console.error("Auth Error Object:", e);
+      const errorMsg = (e.message || "").toLowerCase();
+      if (errorMsg.includes("already exists") || errorMsg.includes("409") || errorMsg.includes("conflict")) {
+        setError("An account with this email already exists. Try logging in instead.");
+      } else if (errorMsg.includes("invalid password") || errorMsg.includes("too short")) {
         setError("Password must be at least 8 characters.");
-      } else if (errorMsg.includes("Invalid credentials") || errorMsg.includes("401")) {
+      } else if (errorMsg.includes("invalid credentials") || errorMsg.includes("401") || errorMsg.includes("unauthorized")) {
         setError(step === "signIn" ? "Invalid email or password." : "Error creating account. Please try again.");
       } else {
-        setError("Authentication failed. Please check your details and try again.");
+        setError("Authentication failed. " + (e.message || "Please check your details and try again."));
       }
-      console.error("Auth Error:", e);
     } finally {
       setLoading(false);
     }

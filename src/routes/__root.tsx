@@ -305,7 +305,7 @@ function RootComponent() {
               reserved.
             </p>
             <p className="text-[8px] text-slate-800 uppercase tracking-widest">
-              v1.3.2-AUTH-STORE-FIX
+              v1.3.3-CLEAN-SLATE
             </p>
           </div>
         </footer>
