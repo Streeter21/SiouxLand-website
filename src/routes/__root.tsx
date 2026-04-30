@@ -129,6 +129,12 @@ function RootComponent() {
               >
                 Reviews
               </Link>
+              <Link
+                to="/my-quotes"
+                className="hover:text-blue-400 transition-colors [&.active]:text-blue-400"
+              >
+                Account
+              </Link>
               <a
                 href="tel:7122815225"
                 className="bg-blue-600 px-4 py-2 rounded-sm hover:bg-blue-500 transition-all font-bold"
@@ -280,7 +286,7 @@ function RootComponent() {
               reserved.
             </p>
             <p className="text-[8px] text-slate-800 uppercase tracking-widest">
-              v1.2.5-safe
+              v1.2.7-auth
             </p>
           </div>
         </footer>

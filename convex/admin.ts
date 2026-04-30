@@ -3,45 +3,42 @@ import { mutation, query } from './_generated/server'
 
 export const list = query({
   args: {},
-  returns: v.array(
-    v.object({
-      _id: v.id('quotes'),
-      _creationTime: v.number(),
-      name: v.string(),
-      email: v.string(),
-      phone: v.string(),
-      description: v.string(),
-      heavyObjects: v.boolean(),
-      stairs: v.boolean(),
-      smallSpaces: v.boolean(),
-      other: v.boolean(),
-      imageIds: v.array(v.id('_storage')),
-      status: v.optional(v.string()),
-      scheduledDate: v.optional(v.string()),
-      scheduledTime: v.optional(v.string()),
-      price: v.optional(v.string()),
-      location: v.optional(v.string()),
-      customerAccepted: v.optional(v.boolean()),
-      customerNotes: v.optional(v.string()),
-    }),
-  ),
+  returns: v.array(v.any()),
   handler: async (ctx) => {
+    console.log("Fetching quotes list...");
     try {
       const quotes = await ctx.db.query('quotes').order('desc').collect()
-      return quotes.map((q) => ({
-        ...q,
-        name: q.name || 'Unknown',
-        email: q.email || 'No Email',
-        phone: q.phone || 'No Phone',
-        description: q.description || '',
-        heavyObjects: !!q.heavyObjects,
-        stairs: !!q.stairs,
-        smallSpaces: !!q.smallSpaces,
-        other: !!q.other,
-        imageIds: Array.isArray(q.imageIds) ? q.imageIds : [],
-      }))
+      console.log(`Found ${quotes.length} quotes`);
+      const result = [];
+      
+      for (const q of quotes) {
+        let user = null;
+        try {
+          if (q.userId) {
+            user = await ctx.db.get(q.userId);
+          }
+        } catch (e) {
+          console.error("Error fetching user for quote", e);
+        }
+        
+        result.push({
+          ...q,
+          name: q.name || (user ? user.name : 'Unknown'),
+          email: q.email || (user ? user.email : 'No Email'),
+          phone: q.phone || 'No Phone',
+          description: q.description || '',
+          heavyObjects: !!q.heavyObjects,
+          stairs: !!q.stairs,
+          smallSpaces: !!q.smallSpaces,
+          other: !!q.other,
+          imageIds: Array.isArray(q.imageIds) ? q.imageIds : [],
+          userEmail: user ? user.email : null,
+          userName: user ? user.name : null
+        });
+      }
+      return result;
     } catch (error) {
-      console.error('Error fetching leads:', error)
+      console.error('Error in admin:list:', error)
       return []
     }
   },
@@ -75,7 +72,7 @@ export const verifyPassword = mutation({
   args: { password: v.string() },
   returns: v.boolean(),
   handler: async (ctx, args) => {
-    // VERSION 1.2.6 SAFE
+    // VERSION 1.2.7 AUTH
     if (args.password === 'siouxland123') return true;
     
     try {
@@ -92,7 +89,7 @@ export const getBackendStatus = query({
   args: {},
   returns: v.string(),
   handler: async () => {
-    return "v1.2.6-safe-backend-active";
+    return "v1.2.7-auth-backend-active";
   }
 })
 
@@ -150,8 +147,6 @@ export const getSocialLinks = query({
   returns: v.any(),
   handler: async (ctx) => {
     try {
-      // Use collect() and filter in JS if index is missing/broken in prod
-      // but better to just try a safe query
       const settings = await ctx.db.query('settings').collect();
       
       const jobber = settings.find(s => s.key === 'social_jobber')?.value ?? '';

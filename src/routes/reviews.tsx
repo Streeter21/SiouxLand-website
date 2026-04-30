@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { useMutation } from 'convex/react'
+import { useMutation, useConvexAuth } from 'convex/react'
 import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
 import { api } from '../../convex/_generated/api'
@@ -10,6 +10,7 @@ export const Route = createFileRoute('/reviews')({
 })
 
 function ReviewsPage() {
+  const { isAuthenticated } = useConvexAuth()
   const submitReview = useMutation(api.reviews.submit)
 
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ function ReviewsPage() {
     try {
       await submitReview(formData)
       setSubmitted(true)
-      setFormData({ name: '', rating: 5, comment: '' })
+      setFormData({ name: formData.name, rating: 5, comment: '' })
     } catch (error: any) {
       console.error(error)
       alert(`Submission failed: ${error.message || "Unknown error"}`)
@@ -54,7 +55,12 @@ function ReviewsPage() {
           {/* Review Form */}
           <div className="md:sticky md:top-32 h-fit">
             <div className="bg-slate-950 text-white p-8 md:p-10 rounded-2xl shadow-2xl">
-              <h3 className="text-2xl font-black uppercase tracking-tighter mb-6">Leave a Review</h3>
+              <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">Leave a Review</h3>
+              {!isAuthenticated && (
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-6">
+                  <Link to="/auth" className="text-blue-400 hover:underline">Login</Link> to post as a verified customer
+                </p>
+              )}
               
               {submitted ? (
                 <div className="text-center py-8">

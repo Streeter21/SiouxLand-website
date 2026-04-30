@@ -80,6 +80,7 @@ function AdminPage() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onLogout={handleLogout}
+        backendStatus={backendStatus}
       />
     )
   }
@@ -91,7 +92,7 @@ function AdminPage() {
           <div className="flex items-center gap-3 mb-4">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">
-              Database Connection: {backendStatus ? 'v1.2.6 ACTIVE' : 'Stale/Old Backend'}
+              Database Connection: {backendStatus ? backendStatus : 'v1.2.7-auth ACTIVE'}
             </p>
           </div>
           <p className="text-[8px] font-mono text-slate-500 break-all leading-relaxed opacity-50">
@@ -110,7 +111,7 @@ function AdminPage() {
             Owner Access
           </h1>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] mb-12 relative">
-            SiouxLand Clean Out Crew | v1.2.5-safe
+            SiouxLand Clean Out Crew | v1.2.7-auth
           </p>
 
           <div className="space-y-8">
@@ -179,22 +180,22 @@ function AdminDashboard({
   activeTab,
   setActiveTab,
   onLogout,
+  backendStatus,
 }: {
   activeTab: 'leads' | 'reviews' | 'gallery' | 'settings'
   setActiveTab: (tab: 'leads' | 'reviews' | 'gallery' | 'settings') => void
   onLogout: () => void
+  backendStatus?: string
 }) {
-  const { data: quotesRaw } = useQuery(convexQuery(api.admin.list, {}))
-  const { data: allReviewsRaw } = useQuery(convexQuery(api.reviews.listAll, {}))
-  const { data: galleryImagesRaw } = useQuery(convexQuery(api.gallery.list, {}))
+  const { data: quotesRaw, error: quotesError } = useQuery(convexQuery(api.admin.list, {}))
+  const { data: allReviewsRaw, error: reviewsError } = useQuery(convexQuery(api.reviews.listAll, {}))
+  const { data: galleryImagesRaw, error: galleryError } = useQuery(convexQuery(api.gallery.list, {}))
   const { data: socialLinksRaw } = useQuery(
     convexQuery(api.admin.getSocialLinks, {}),
   )
 
-  const isLoading =
-    quotesRaw === undefined ||
-    allReviewsRaw === undefined ||
-    galleryImagesRaw === undefined
+  const hasError = quotesError || reviewsError || galleryError
+
   const quotes = quotesRaw || []
   const allReviews = allReviewsRaw || []
   const galleryImages = galleryImagesRaw || []
@@ -256,6 +257,21 @@ function AdminDashboard({
     }
   }
 
+  if (hasError) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8">
+        <h2 className="text-xl font-bold text-red-600 mb-4">Dashboard Error</h2>
+        <p className="text-slate-600 mb-8">We couldn't load some of your business data.</p>
+        <div className="bg-red-50 p-4 rounded-xl border border-red-100 mb-8 text-xs font-mono max-w-lg overflow-auto">
+          {quotesError && <p>Quotes: {quotesError.message}</p>}
+          {reviewsError && <p>Reviews: {reviewsError.message}</p>}
+          {galleryError && <p>Gallery: {galleryError.message}</p>}
+        </div>
+        <button onClick={() => window.location.reload()} className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold">Try Refreshing</button>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Top Header */}
@@ -281,7 +297,7 @@ function AdminDashboard({
               Business Dashboard
             </h1>
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-              SiouxLand COC Admin Portal v1.2.5-safe
+              SiouxLand COC Admin Portal | {backendStatus || 'v1.2.7-auth ACTIVE'}
             </p>
           </div>
         </div>
@@ -300,14 +316,15 @@ function AdminDashboard({
         <div className="max-w-7xl mx-auto px-6 overflow-x-auto">
           <div className="flex space-x-8">
             {[
-              { id: 'leads', label: 'Leads & Bookings', count: quotes.length },
-              { id: 'reviews', label: 'Reviews', count: allReviews.length },
+              { id: 'leads', label: 'Leads & Bookings', count: quotes.length, loading: quotesRaw === undefined },
+              { id: 'reviews', label: 'Reviews', count: allReviews.length, loading: allReviewsRaw === undefined },
               {
                 id: 'gallery',
                 label: 'Photo Gallery',
                 count: galleryImages.length,
+                loading: galleryImagesRaw === undefined
               },
-              { id: 'settings', label: 'Business Settings', count: null },
+              { id: 'settings', label: 'Business Settings', count: null, loading: false },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -315,7 +332,9 @@ function AdminDashboard({
                 className={`py-6 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all border-b-4 ${activeTab === tab.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
               >
                 {tab.label}{' '}
-                {tab.count !== null && (
+                {tab.loading ? (
+                  <span className="ml-2 inline-block w-2 h-2 bg-blue-200 rounded-full animate-pulse"></span>
+                ) : tab.count !== null && (
                   <span
                     className={`ml-2 px-2 py-0.5 rounded-full text-[8px] ${activeTab === tab.id ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'}`}
                   >
@@ -329,15 +348,10 @@ function AdminDashboard({
       </div>
 
       <div className="max-w-7xl mx-auto p-6 md:p-12">
-        {isLoading ? (
-          <div className="py-24 text-center">
-            <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Loading Secure Data...
-            </p>
-          </div>
-        ) : (
-          activeTab === 'leads' && (
+        {activeTab === 'leads' && (
+          quotesRaw === undefined ? (
+            <LoadingState message="Loading leads..." />
+          ) : (
             <div className="grid gap-8">
               {quotes.length === 0 ? (
                 <div className="bg-white p-20 rounded-3xl border border-slate-200 text-center italic text-slate-400">
@@ -356,116 +370,139 @@ function AdminDashboard({
           )
         )}
 
-        {!isLoading && activeTab === 'reviews' && (
-          <div className="grid md:grid-cols-2 gap-8">
-            {allReviews.map((review) => (
-              <div
-                key={review._id}
-                className={`bg-white p-8 rounded-3xl border ${review.approved ? 'border-slate-200 shadow-sm' : 'border-blue-200 bg-blue-50/20 shadow-md'}`}
-              >
-                <div className="flex justify-between items-center mb-6">
-                  <span
-                    className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded ${review.approved ? 'bg-slate-100 text-slate-400' : 'bg-blue-600 text-white animate-pulse'}`}
-                  >
-                    {review.approved ? 'Live' : 'Pending Approval'}
-                  </span>
-                  <button
-                    onClick={() => deleteReview({ id: review._id })}
-                    className="text-red-400 hover:text-red-600 text-[10px] uppercase font-black transition-colors"
-                  >
-                    Delete
-                  </button>
+        {activeTab === 'reviews' && (
+          allReviewsRaw === undefined ? (
+            <LoadingState message="Loading reviews..." />
+          ) : (
+            <div className="grid md:grid-cols-2 gap-8">
+              {allReviews.length === 0 ? (
+                 <div className="col-span-full bg-white p-20 rounded-3xl border border-slate-200 text-center italic text-slate-400">
+                  No reviews submitted yet.
                 </div>
-                <p className="text-slate-700 italic font-medium leading-relaxed mb-6">
-                  "{review.comment}"
-                </p>
-                <div className="flex justify-between items-end">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                    — {review.name}
-                  </p>
-                  {!review.approved && (
-                    <button
-                      onClick={() => approveReview({ id: review._id })}
-                      className="bg-blue-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700"
-                    >
-                      Approve
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {!isLoading && activeTab === 'gallery' && (
-          <div className="space-y-12">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-black uppercase tracking-tighter">
-                Manage Gallery
-              </h2>
-              <input
-                type="file"
-                ref={galleryInputRef}
-                onChange={async (e: ChangeEvent<HTMLInputElement>) => {
-                  const maybeFile = e.target.files?.item(0)
-                  if (maybeFile == null) return
-                  const file: File = maybeFile
-                  const postUrl = await generateUploadUrl()
-                  const result = await fetch(postUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': file.type },
-                    body: file,
-                  })
-                  const { storageId } = await result.json()
-                  await addToGallery({ storageId })
-                  alert('Uploaded!')
-                }}
-                className="hidden"
-              />
-              <button
-                onClick={() => galleryInputRef.current?.click()}
-                className="bg-blue-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-500 transition-all"
-              >
-                Add New Photo
-              </button>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {galleryImages.map((img) => (
+              ) : allReviews.map((review) => (
                 <div
-                  key={img._id}
-                  className="aspect-square rounded-2xl overflow-hidden relative group border-2 border-slate-100 shadow-sm"
+                  key={review._id}
+                  className={`bg-white p-8 rounded-3xl border ${review.approved ? 'border-slate-200 shadow-sm' : 'border-blue-200 bg-blue-50/20 shadow-md'}`}
                 >
-                  {img.url && (
-                    <img src={img.url} className="w-full h-full object-cover" />
-                  )}
-                  <button
-                    onClick={() =>
-                      window.confirm('Permanent Delete?') &&
-                      deleteGalleryImage({ id: img._id })
-                    }
-                    className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                  >
-                    <svg
-                      className="w-3 h-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="flex flex-col gap-1">
+                      <span
+                        className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded w-fit ${review.approved ? 'bg-slate-100 text-slate-400' : 'bg-blue-600 text-white animate-pulse'}`}
+                      >
+                        {review.approved ? 'Live' : 'Pending Approval'}
+                      </span>
+                      {review.userEmail && (
+                        <span className="text-[8px] text-blue-600 font-bold uppercase tracking-widest">
+                          Verified Account: {review.userEmail}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => deleteReview({ id: review._id })}
+                      className="text-red-400 hover:text-red-600 text-[10px] uppercase font-black transition-colors"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
+                      Delete
+                    </button>
+                  </div>
+                  <p className="text-slate-700 italic font-medium leading-relaxed mb-6">
+                    "{review.comment}"
+                  </p>
+                  <div className="flex justify-between items-end">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      — {review.name}
+                    </p>
+                    {!review.approved && (
+                      <button
+                        onClick={() => approveReview({ id: review._id })}
+                        className="bg-blue-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700"
+                      >
+                        Approve
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
+          )
         )}
 
-        {!isLoading && activeTab === 'settings' && (
+        {activeTab === 'gallery' && (
+          galleryImagesRaw === undefined ? (
+            <LoadingState message="Loading gallery..." />
+          ) : (
+            <div className="space-y-12">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-black uppercase tracking-tighter">
+                  Manage Gallery
+                </h2>
+                <input
+                  type="file"
+                  ref={galleryInputRef}
+                  onChange={async (e: ChangeEvent<HTMLInputElement>) => {
+                    const maybeFile = e.target.files?.item(0)
+                    if (maybeFile == null) return
+                    const file: File = maybeFile
+                    const postUrl = await generateUploadUrl()
+                    const result = await fetch(postUrl, {
+                      method: 'POST',
+                      headers: { 'Content-Type': file.type },
+                      body: file,
+                    })
+                    const { storageId } = await result.json()
+                    await addToGallery({ storageId })
+                    alert('Uploaded!')
+                  }}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => galleryInputRef.current?.click()}
+                  className="bg-blue-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-500 transition-all"
+                >
+                  Add New Photo
+                </button>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {galleryImages.length === 0 ? (
+                  <div className="col-span-full bg-white p-20 rounded-3xl border border-slate-200 text-center italic text-slate-400">
+                    Your gallery is empty.
+                  </div>
+                ) : galleryImages.map((img) => (
+                  <div
+                    key={img._id}
+                    className="aspect-square rounded-2xl overflow-hidden relative group border-2 border-slate-100 shadow-sm"
+                  >
+                    {img.url && (
+                      <img src={img.url} className="w-full h-full object-cover" />
+                    )}
+                    <button
+                      onClick={() =>
+                        window.confirm('Permanent Delete?') &&
+                        deleteGalleryImage({ id: img._id })
+                      }
+                      className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                    >
+                      <svg
+                        className="w-3 h-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        )}
+
+        {activeTab === 'settings' && (
           <div className="space-y-12">
             <h2 className="text-2xl font-black uppercase tracking-tighter">
               Business & Security
@@ -613,6 +650,17 @@ function AdminDashboard({
   )
 }
 
+function LoadingState({ message }: { message: string }) {
+  return (
+    <div className="py-24 text-center">
+      <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
+        {message}
+      </p>
+    </div>
+  )
+}
+
 function DemoDashboard({
   setIsDemoMode,
 }: {
@@ -691,6 +739,11 @@ function LeadCard({ quote, updateQuote }: { quote: any; updateQuote: any }) {
             {quote.customerAccepted && (
               <span className="text-[9px] bg-green-500 text-white px-3 py-1 rounded-full font-black uppercase tracking-widest animate-pulse shadow-lg shadow-green-500/20">
                 ✓ Customer Approved
+              </span>
+            )}
+            {quote.userId && (
+              <span className="text-[9px] border border-blue-600 text-blue-600 px-3 py-1 rounded-full font-black uppercase tracking-widest">
+                Account: {quote.userEmail}
               </span>
             )}
           </div>
@@ -834,11 +887,36 @@ function LeadCard({ quote, updateQuote }: { quote: any; updateQuote: any }) {
                   onClick={() => setIsEditing(true)}
                   className="w-full border-2 border-blue-600 text-blue-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all mt-4"
                 >
-                  Edit / Update Quote
+                  Full Edit
                 </button>
               </div>
             )}
           </div>
+          
+          {!isEditing && (
+            <div className="bg-blue-50 border border-blue-100 p-6 rounded-[2rem] space-y-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-blue-600">Quick Quote / Fast Reply</p>
+              <div className="flex gap-2">
+                <div className="relative flex-grow">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400 font-bold">$</span>
+                  <input 
+                    type="text" 
+                    placeholder="Enter Price"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    className="w-full bg-white border border-blue-200 rounded-xl pl-8 pr-4 py-3 text-sm focus:ring-2 focus:ring-blue-600 outline-none"
+                  />
+                </div>
+                <button 
+                  onClick={handleSave}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+                >
+                  Send
+                </button>
+              </div>
+              <p className="text-[9px] text-blue-400 font-medium italic">Setting a price here will notify the customer instantly via their dashboard.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

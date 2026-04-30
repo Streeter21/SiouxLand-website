@@ -1,5 +1,6 @@
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
+import { auth } from "./auth";
 
 export const submit = mutation({
   args: {
@@ -16,9 +17,12 @@ export const submit = mutation({
   },
   returns: v.string(),
   handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    
     try {
       const id = await ctx.db.insert('quotes', {
         ...args,
+        ...(userId ? { userId } : {}),
         status: 'pending',
         customerAccepted: false,
         location: args.location || 'Unknown',
@@ -30,6 +34,21 @@ export const submit = mutation({
     }
   },
 })
+
+export const listMyQuotes = query({
+  args: {},
+  returns: v.array(v.any()),
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) return [];
+
+    return await ctx.db
+      .query("quotes")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
+  },
+});
 
 export const get = query({
   args: { id: v.id('quotes') },

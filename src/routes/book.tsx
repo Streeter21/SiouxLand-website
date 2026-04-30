@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as React from 'react'
 import { useState, useRef } from 'react'
-import { useMutation } from 'convex/react'
+import { useMutation, useConvexAuth } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
 export const Route = createFileRoute('/book')({
@@ -9,6 +9,7 @@ export const Route = createFileRoute('/book')({
 })
 
 function BookPage() {
+  const { isAuthenticated } = useConvexAuth()
   const submitQuote = useMutation(api.quotes.submit)
   const generateUploadUrl = useMutation(api.quotes.generateUploadUrl)
 
@@ -88,6 +89,20 @@ function BookPage() {
         </p>
       </div>
 
+      {!isAuthenticated && !submitted && (
+        <div className="max-w-3xl mx-auto mt-12 px-4">
+          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h4 className="text-blue-900 font-bold uppercase tracking-widest text-xs mb-1">Recommended</h4>
+              <p className="text-blue-800 text-sm font-medium">Create an account to track all your quotes, accept prices, and see your service history.</p>
+            </div>
+            <Link to="/auth" className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 shrink-0">
+              Create Account
+            </Link>
+          </div>
+        </div>
+      )}
+
       <section className="py-24 px-4 md:px-8">
         <div className="max-w-3xl mx-auto bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden">
           <div className="p-8 md:p-12">
@@ -101,17 +116,32 @@ function BookPage() {
                 <h4 className="text-3xl font-black uppercase tracking-tighter mb-4">Request Received!</h4>
                 <p className="text-slate-600 mb-8">Thanks for reaching out. We'll review your job and contact you within 24 hours.</p>
                 
-                {quoteId && (
-                  <div className="mb-12 p-6 bg-blue-50 rounded-2xl border border-blue-100">
+                {isAuthenticated ? (
+                  <div className="mb-12 p-6 bg-blue-50 rounded-2xl border border-blue-100 text-center mx-auto max-w-md">
+                    <p className="text-sm text-blue-900 font-bold mb-2 uppercase tracking-widest">Saved to your account</p>
+                    <p className="text-xs text-blue-700 mb-6">You can track the progress and approve the price in your dashboard:</p>
+                    <Link 
+                      to="/my-quotes" 
+                      className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-blue-700 transition-all"
+                    >
+                      View My Account →
+                    </Link>
+                  </div>
+                ) : quoteId && (
+                  <div className="mb-12 p-6 bg-blue-50 rounded-2xl border border-blue-100 mx-auto max-w-md text-left">
                     <p className="text-sm text-blue-900 font-bold mb-4 uppercase tracking-widest">Your Private Status Link</p>
-                    <p className="text-xs text-blue-700 mb-6">Bookmark this page to see when we reply with your price and date:</p>
+                    <p className="text-xs text-blue-700 mb-4">Bookmark this page to see when we reply with your price and date:</p>
                     <Link 
                       to="/status/$quoteId" 
                       params={{ quoteId }}
-                      className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-blue-700 transition-all"
+                      className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-blue-700 transition-all mb-4"
                     >
                       View Your Quote Status →
                     </Link>
+                    <div className="pt-4 border-t border-blue-200 text-center">
+                      <p className="text-[10px] font-bold text-blue-800 uppercase tracking-widest mb-3">Want to save this to your account?</p>
+                      <Link to="/auth" className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">Create an Account to track all quotes →</Link>
+                    </div>
                   </div>
                 )}
 

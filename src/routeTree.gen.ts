@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as OwnerRouteImport } from './routes/owner'
+import { Route as MyQuotesRouteImport } from './routes/my-quotes'
 import { Route as BookRouteImport } from './routes/book'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StatusQuoteIdRouteImport } from './routes/status.$quoteId'
@@ -26,9 +28,19 @@ const OwnerRoute = OwnerRouteImport.update({
   path: '/owner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyQuotesRoute = MyQuotesRouteImport.update({
+  id: '/my-quotes',
+  path: '/my-quotes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookRoute = BookRouteImport.update({
   id: '/book',
   path: '/book',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -50,7 +62,9 @@ const StatusQuoteIdRoute = StatusQuoteIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/book': typeof BookRoute
+  '/my-quotes': typeof MyQuotesRoute
   '/owner': typeof OwnerRoute
   '/reviews': typeof ReviewsRoute
   '/status/$quoteId': typeof StatusQuoteIdRoute
@@ -58,7 +72,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/book': typeof BookRoute
+  '/my-quotes': typeof MyQuotesRoute
   '/owner': typeof OwnerRoute
   '/reviews': typeof ReviewsRoute
   '/status/$quoteId': typeof StatusQuoteIdRoute
@@ -67,7 +83,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/book': typeof BookRoute
+  '/my-quotes': typeof MyQuotesRoute
   '/owner': typeof OwnerRoute
   '/reviews': typeof ReviewsRoute
   '/status/$quoteId': typeof StatusQuoteIdRoute
@@ -77,17 +95,29 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/auth'
     | '/book'
+    | '/my-quotes'
     | '/owner'
     | '/reviews'
     | '/status/$quoteId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/book' | '/owner' | '/reviews' | '/status/$quoteId'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/book'
+    | '/my-quotes'
+    | '/owner'
+    | '/reviews'
+    | '/status/$quoteId'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/auth'
     | '/book'
+    | '/my-quotes'
     | '/owner'
     | '/reviews'
     | '/status/$quoteId'
@@ -96,7 +126,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AuthRoute: typeof AuthRoute
   BookRoute: typeof BookRoute
+  MyQuotesRoute: typeof MyQuotesRoute
   OwnerRoute: typeof OwnerRoute
   ReviewsRoute: typeof ReviewsRoute
   StatusQuoteIdRoute: typeof StatusQuoteIdRoute
@@ -118,11 +150,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-quotes': {
+      id: '/my-quotes'
+      path: '/my-quotes'
+      fullPath: '/my-quotes'
+      preLoaderRoute: typeof MyQuotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/book': {
       id: '/book'
       path: '/book'
       fullPath: '/book'
       preLoaderRoute: typeof BookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -152,7 +198,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AuthRoute: AuthRoute,
   BookRoute: BookRoute,
+  MyQuotesRoute: MyQuotesRoute,
   OwnerRoute: OwnerRoute,
   ReviewsRoute: ReviewsRoute,
   StatusQuoteIdRoute: StatusQuoteIdRoute,
