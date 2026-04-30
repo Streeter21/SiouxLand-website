@@ -5,8 +5,8 @@ import { v } from "convex/values";
 export const getBackendStatus = query({
   args: {},
   returns: v.string(),
-  handler: async (ctx) => {
-    return "v1.2.7-auth ACTIVE";
+  handler: async () => {
+    return "v1.3.3 ACTIVE";
   },
 });
 
