@@ -92,7 +92,7 @@ function AdminPage() {
           <div className="flex items-center gap-3 mb-4">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">
-              Database Connection: {backendStatus ? backendStatus : 'v1.3.3-CLEAN-SLATE'}
+              Database Connection: {backendStatus ? backendStatus : 'v1.3.6-LIVE-STABLE'}
             </p>
           </div>
           <p className="text-[8px] font-mono text-slate-500 break-all leading-relaxed opacity-50">
@@ -111,7 +111,7 @@ function AdminPage() {
             Owner Access
           </h1>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] mb-12 relative">
-            SiouxLand Clean Out Crew | v1.3.3-CLEAN-SLATE
+            SiouxLand Clean Out Crew | v1.3.6-LIVE-STABLE
           </p>
 
           <div className="space-y-8">
