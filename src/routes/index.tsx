@@ -11,7 +11,7 @@ function HomePage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-slate-950 text-white py-24 md:py-32 px-4 md:px-8 relative overflow-hidden">
+      <section className="bg-slate-900 text-white py-24 md:py-32 px-4 md:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500 via-transparent to-transparent opacity-50" />
         </div>
@@ -26,7 +26,7 @@ function HomePage() {
                 CLEAN SPACE.<br />
                 <span className="text-blue-400">CLEAR MIND.</span>
               </h2>
-              <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-md leading-relaxed">
+              <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-md leading-relaxed">
                 We handle the heavy lifting so you don't have to. Professional, local, and ready to clear your clutter.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -38,17 +38,17 @@ function HomePage() {
                 </Link>
                 <a 
                   href="tel:7122815225" 
-                  className="border border-slate-700 bg-slate-900/50 backdrop-blur-sm px-10 py-5 text-center rounded-sm font-black uppercase tracking-widest hover:bg-slate-800 transition-all"
+                  className="border border-slate-600 bg-slate-800/50 backdrop-blur-sm px-10 py-5 text-center rounded-sm font-black uppercase tracking-widest hover:bg-slate-700 transition-all"
                 >
                   Call Now
                 </a>
               </div>
             </div>
             <div className="hidden md:block">
-               <div className="aspect-square bg-blue-950/20 border border-blue-900/30 rounded-3xl p-12 relative">
+               <div className="aspect-square bg-blue-900/20 border border-blue-800/30 rounded-3xl p-12 relative">
                   <div className="absolute -top-12 -right-12 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl" />
                   <div className="relative z-10 flex flex-col justify-center h-full text-center">
-                    <p className="text-4xl italic text-blue-400 font-serif mb-6 leading-tight">
+                    <p className="text-4xl italic text-blue-300 font-serif mb-6 leading-tight">
                       "Professional, fast, and completely stress-free."
                     </p>
                     <p className="font-bold uppercase tracking-widest text-sm">— SiouxLand Clean Out Crew</p>
@@ -145,22 +145,22 @@ function GallerySection() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-             {galleryImages.slice(0, 8).map(img => (
-               <div key={img._id} className="aspect-[4/5] bg-slate-200 overflow-hidden rounded-xl group relative shadow-lg">
-                 {img.url ? (
-                   <img 
-                     src={img.url} 
-                     alt={img.caption || "Job photo"} 
-                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                   />
-                 ) : (
-                   <div className="w-full h-full flex items-center justify-center text-slate-400 italic text-sm">
-                     Loading...
-                   </div>
-                 )}
-                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-               </div>
-             ))}
+            {galleryImages.slice(0, 8).map(img => (
+              <div key={img._id} className="aspect-[4/5] bg-slate-100 overflow-hidden rounded-xl group relative shadow-lg">
+                {img.url ? (
+                  <img 
+                    src={img.url} 
+                    alt={img.caption || "Job photo"} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-400 italic text-sm">
+                    Loading...
+                  </div>
+                )  }
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            ))}
           </div>
         )}
       </div>
